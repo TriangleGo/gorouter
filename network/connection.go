@@ -10,17 +10,19 @@ import (
 
 // client.go
 type Connection struct {
-	Conn     net.Conn
-	TcpChan  chan protocol.Protocol
-	IpcChan  chan protocol.Protocol
-	ExitChan chan string
+	Conn          net.Conn
+	TcpChan       chan protocol.Protocol
+	IpcChan       chan protocol.Protocol
+	ExitChan      chan string
+	FirstDataChan chan []byte
 }
 
 func NewConnection(_conn net.Conn) *Connection {
 	return &Connection{Conn: _conn,
-		IpcChan:  make(chan protocol.Protocol),
-		TcpChan:  make(chan protocol.Protocol),
-		ExitChan: make(chan string)}
+		IpcChan:       make(chan protocol.Protocol),
+		TcpChan:       make(chan protocol.Protocol),
+		ExitChan:      make(chan string),
+		FirstDataChan: make(chan []byte, 1024)}
 }
 
 func (this *Connection) Serve() {
@@ -29,8 +31,9 @@ func (this *Connection) Serve() {
 }
 
 func (this *Connection) serveLoop() {
-
+	var fristPack = true
 	for {
+		//looping to recv the client
 		buf := make([]byte, 4096)
 		n, err := this.Conn.Read(buf)
 		if err != nil {
@@ -39,6 +42,18 @@ func (this *Connection) serveLoop() {
 			break
 		}
 
+		//when the user connected,the first data will not parse to protocol
+		//it will send to the ConnHandler for modify
+		if fristPack {
+			maxSize := 1024
+			if n > maxSize {
+				this.FirstDataChan <- buf[0:maxSize]
+			} else {
+				this.FirstDataChan <- buf[0:n]
+			}
+		}
+
+		//construct the protocol and send it to the handler
 		proto := protocol.NewProtocal()
 		_, err = proto.PraseFromData(buf[0:n], n)
 		if err != nil {
@@ -51,12 +66,15 @@ func (this *Connection) serveLoop() {
 
 func (this *Connection) serveHandle() {
 	fmt.Printf("TCPHandle looping tcp \n")
-	
-	defer this.Conn.Close()
-	
-	client := types.NewClient()
-	handler.GetRouter().ConnHandler.Handle(client)
 
+	defer this.Conn.Close()
+
+	client := types.NewClient(this.Conn)
+
+	//serve when connect
+	go handler.GetRouter().ConnHandler.Handle(client, this.FirstDataChan)
+
+	//loop recv protocol
 	for {
 		select {
 		case data, ok := <-this.TcpChan:

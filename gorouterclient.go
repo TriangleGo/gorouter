@@ -3,15 +3,15 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"gorouter/network/protocol"
+	"gorouter/network/simplebuffer"
 	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
-	"protocol"
 	"regexp"
-	"simplebuffer"
 	"strings"
 )
 

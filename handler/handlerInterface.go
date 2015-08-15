@@ -16,5 +16,5 @@ type DisconnectHandler interface {
 
 //some one connected
 type ConnectHandler interface {
-	Handle(client *types.Client) *types.Client
+	Handle(client *types.Client, ch chan []byte) *types.Client
 }
