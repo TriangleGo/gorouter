@@ -35,6 +35,7 @@ func (this *Connection) serveLoop() {
 	for {
 		//looping to recv the client
 		buf := make([]byte, 4096)
+		this.Conn.SetReadDeadline(time.Now().Add( 45 * time.Second))
 		n, err := this.Conn.Read(buf)
 		if err != nil {
 			fmt.Printf("Client Read Buffer Failed %v %v\r\n", err, n)
