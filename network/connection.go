@@ -12,15 +12,17 @@ import (
 type Connection struct {
 	Conn          net.Conn
 	TcpChan       chan protocol.Protocol
-	IpcChan       chan protocol.Protocol
+	IpcChan       types.IPCSolid
+	RpcChan       chan protocol.Protocol
 	ExitChan      chan string
 	FirstDataChan chan []byte
 }
 
 func NewConnection(_conn net.Conn) *Connection {
 	return &Connection{Conn: _conn,
-		IpcChan:       make(chan protocol.Protocol),
+		IpcChan:       make(chan types.IPCSolid),
 		TcpChan:       make(chan protocol.Protocol),
+		RpcChan:       make(chan protocol.Protocol),
 		ExitChan:      make(chan string),
 		FirstDataChan: make(chan []byte, 1024)}
 }
@@ -89,6 +91,16 @@ func (this *Connection) serveHandle() {
 			}
 			break
 		case data, ok := <-this.IpcChan:
+			fmt.Printf("IPCHandler %v %v\r\n", string(data.Data[0:10]), ok)
+			h := handler.GetRouter().GetTcpHandler()[data.ModuleId]
+			if h != nil {
+				c := h.Handle(client)
+				if c != nil {
+					client = c
+				}
+			}
+			break
+		case data, ok := <-this.RpcChan:
 			fmt.Printf("IPCHandler %v %v\r\n", string(data.Data[0:10]), ok)
 			h := handler.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
