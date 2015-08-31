@@ -19,6 +19,8 @@ func main() {
 	NewTCPServer("tcp", ":9090").Run()
 	fmt.Printf("Go run HTTPServer \r\n")
 	go HTTPServer()
+	fmt.Printf("Go run WSServer \r\n")
+	go WSServer()
 
 	fmt.Printf("CpuProfile %v \n", string(runtime.CPUProfile()))
 	for {
