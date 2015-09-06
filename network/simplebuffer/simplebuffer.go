@@ -127,3 +127,4 @@ func (this *SimpleBuffer) ReadData(size int) []byte {
 	this.offset -= size
 	return ret
 }
+

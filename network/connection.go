@@ -1,6 +1,7 @@
 package network
 
 import (
+	"time"
 	"fmt"
 	"gorouter/handler"
 	"gorouter/network/protocol"
@@ -93,16 +94,6 @@ func (this *Connection) serveHandle() {
 		case data, ok := <-this.IpcChan:
 			fmt.Printf("IPCHandler %v %v\r\n", data.Data, ok)
 			h := handler.GetRouter().GetTcpHandler()[uint8(data.ModuleId)]
-			if h != nil {
-				c := h.Handle(client)
-				if c != nil {
-					client = c
-				}
-			}
-			break
-		case data, ok := <-this.RpcChan:
-			fmt.Printf("IPCHandler %v %v\r\n", string(data.Data[0:10]), ok)
-			h := handler.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client)
 				if c != nil {

@@ -2,8 +2,8 @@ package types
 
 
 type IPCSolid struct {
-	ModuleID int
-	CommandID int
+	ModuleId int
+	CommandId int
 	Data interface{}
 	RetChan interface{}
 }

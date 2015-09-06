@@ -6,7 +6,7 @@ import (
 )
 
 type ConnectionManager struct {
-	Connections map[int64]*Connection
+	
 }
 
 func Push() {

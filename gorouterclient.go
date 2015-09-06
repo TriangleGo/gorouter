@@ -181,16 +181,16 @@ func rewriteURI(src []byte, start int, end int, fixUri string) []byte {
 
 func main() {
 	fmt.Print("Go Router Client Runing \n")
-	connClient, err := net.Dial("tcp", "127.0.0.1:9090")
+	connClient, err := net.Dial("tcp", "127.0.0.1:9093")
 	if err != nil {
 		fmt.Print("Client Connecting error \n")
 		return
 	}
 
 	buffer := simplebuffer.NewSimpleBuffer("bigEndian")
-	buffer.WriteUInt32(10)
-	buffer.WriteUInt8(4)
-	buffer.WriteUInt8(3)
+	buffer.WriteUInt32(6)
+	buffer.WriteUInt8(0x80)
+	buffer.WriteUInt8(1)
 	buffer.WriteData([]byte("1234"))
 	fmt.Printf("send data %v \n", buffer.Data())
 
@@ -205,6 +205,7 @@ func main() {
 			break
 		}
 
+		fmt.Printf("recv data %v \n",buf[0:n])
 		proto := protocol.NewProtocal()
 		_, err = proto.PraseFromData(buf[0:n], n)
 		if err != nil {

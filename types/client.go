@@ -7,13 +7,14 @@ import (
 type Client struct {
 	ClientID int
 	Token    string
-	Conn     net.Conn
+	conn     net.Conn
+
 }
 
 func NewClient(c net.Conn) *Client {
-	return &Client{Conn: c}
+	return &Client{conn: c}
 }
 
 func (this *Client) GetConn() net.Conn {
-	return this.Conn
+	return this.conn
 }
