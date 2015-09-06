@@ -15,13 +15,12 @@ type TCPServer struct {
 	dsn         string //127.0.0.1:port
 	protocol    string //tcp
 	listener    net.Listener
-	connManager *network.ConnectionManager
+	
 }
 
 func NewTCPServer(_protocol string, _dsn string) *TCPServer {
 	return &TCPServer{protocol: _protocol,
-		dsn:         _dsn,
-		connManager: network.NewConnectionManager()}
+		dsn:         _dsn}
 }
 
 func (this *TCPServer) ServerListen() error {
@@ -44,7 +43,8 @@ func (this *TCPServer) ServerAccpet() {
 			continue
 		}
 		//接收数据
-		this.connManager.Produce(&conn).Serve()
+		network.GetConnectionManager().Produce(network.NewBaseSocket(conn)).AsyncServe()
+		//this.connManager.Produce(&conn).Serve()
 	}
 
 }

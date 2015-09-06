@@ -22,9 +22,9 @@ func main() {
 	fmt.Printf("Go run TCPServer \r\n")
 	server.NewTCPServer("tcp", ":9090").Run()
 	fmt.Printf("Go run HTTPServer \r\n")
-	server.NewHTTPServer(":9091")
+	server.NewHTTPServer(":9091").Run()
 	fmt.Printf("Go run WSServer \r\n")
-	server.NewWSServer(":9092")
+	server.NewWSServer(":9092").Run()
 	
 	a ,_:= net.Dial("tcp","127.0.0.1:9090")
 	fmt.Printf(" remote %v\n",a.RemoteAddr())

@@ -2,22 +2,33 @@ package network
 
 import (
 	"fmt"
-	"net"
+	_"net"
 )
 
 type ConnectionManager struct {
 	
 }
 
-func Push() {
-	fmt.Printf("test")
-}
-
 func NewConnectionManager() *ConnectionManager {
 	return &ConnectionManager{}
 }
 
-func (this *ConnectionManager) Produce(c *net.Conn) *Connection {
-	connection := NewConnection(*c)
+func (this *ConnectionManager) Produce(s *BaseSocket) *Connection {
+	connection := NewConnection(s)
 	return connection
 }
+
+/*
+*	static model
+*/
+var connMgr *ConnectionManager
+
+func GetConnectionManager() *ConnectionManager{
+	fmt.Printf("static Manager call \n")
+	if connMgr == nil {
+		connMgr = NewConnectionManager() 
+	} 
+	return connMgr
+}
+
+

@@ -107,7 +107,7 @@ func (this *BaseSocket) Read(b []byte) (n int, err error){
 	if ret[1].IsNil() {
 		return (ret[0].Interface()).(int),nil 
 	}
-	return (ret[0].Interface()).(int),(ret[0].Interface()).(error)
+	return (ret[0].Interface()).(int),(ret[1].Interface()).(error)
 }
 
 
@@ -118,5 +118,5 @@ func (this *BaseSocket) Write(b []byte) (n int, err error){
 	if ret[1].IsNil() {
 		return (ret[0].Interface()).(int),nil 
 	}
-	return ret[0].Interface()).(int),(ret[0].Interface()).(error)
+	return (ret[0].Interface()).(int),(ret[1].Interface()).(error)
 }

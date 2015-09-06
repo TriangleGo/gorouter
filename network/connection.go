@@ -6,12 +6,12 @@ import (
 	"gorouter/handler"
 	"gorouter/network/protocol"
 	"gorouter/types"
-	"net"
+	_"net"
 )
 
 // client.go
 type Connection struct {
-	Conn          net.Conn
+	Conn          *BaseSocket
 	TcpChan       chan protocol.Protocol
 	IpcChan       chan types.IPCSolid
 	RpcChan       chan protocol.Protocol
@@ -19,8 +19,8 @@ type Connection struct {
 	FirstDataChan chan []byte
 }
 
-func NewConnection(_conn net.Conn) *Connection {
-	return &Connection{Conn: _conn,
+func NewConnection(s *BaseSocket) *Connection {
+	return &Connection{Conn: s,
 		IpcChan:       make(chan types.IPCSolid),
 		TcpChan:       make(chan protocol.Protocol),
 		RpcChan:       make(chan protocol.Protocol),
@@ -28,7 +28,12 @@ func NewConnection(_conn net.Conn) *Connection {
 		FirstDataChan: make(chan []byte, 1024)}
 }
 
-func (this *Connection) Serve() {
+func (this *Connection) SyncServe() {
+	this.serveLoop()
+	go this.serveHandle()
+}
+
+func (this *Connection) AsyncServe() {
 	go this.serveLoop()
 	go this.serveHandle()
 }
