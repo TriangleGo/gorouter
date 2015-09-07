@@ -6,6 +6,7 @@ import (
 
 // protocol handler
 type Handler interface {
+	Init()
 	Handle(client *types.Client) *types.Client
 }
 

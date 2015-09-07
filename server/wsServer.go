@@ -15,6 +15,7 @@ type WebSocketServer struct {
 // Echo the data received on the WebSocket.
 func WsServerProc(ws *websocket.Conn) {
 	fmt.Printf("wsserver connection \n")
+	// conn starting
 	network.GetConnectionManager().
 		Produce(network.NewBaseSocket(ws)).SyncServe()
 }

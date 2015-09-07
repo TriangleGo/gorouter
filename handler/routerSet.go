@@ -12,13 +12,20 @@ func InitRouter() {
 	}
 	_router = NewRouter()
 
-	//装载handler
+	//setup handler
 	GetRouter().SetConnHandler(&handlerImpl.ConnHandlerImpl{})
 	GetRouter().SetDisconHandler(&handlerImpl.DisconHandlerImpl{})
 
 	Dispatchs := map[uint8]Handler{
 		0: &handlerImpl.LoginHandlerImpl{},
 	}
+	
+	for _,v := range Dispatchs {
+		//init all module
+		v.Init()
+	}
+	
+	GetRouter().SetTcpHandler(Dispatchs)
 	GetRouter().SetIpcHandler(Dispatchs)
 
 }
