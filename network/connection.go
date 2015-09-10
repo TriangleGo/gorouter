@@ -90,7 +90,7 @@ func (this *Connection) serveHandle() {
 			fmt.Printf("TCPHandler %v %v\r\n", data, ok)
 			h := handler.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
-				c := h.Handle(client)
+				c := h.Handle(client,data.Data)
 				if c != nil {
 					client = c
 				}
@@ -98,9 +98,9 @@ func (this *Connection) serveHandle() {
 			break
 		case data, ok := <-this.IpcChan:
 			fmt.Printf("IPCHandler %v %v\r\n", data.Data, ok)
-			h := handler.GetRouter().GetTcpHandler()[uint8(data.ModuleId)]
+			h := handler.GetRouter().GetIpcHandler()[uint8(data.ModuleId)]
 			if h != nil {
-				c := h.Handle(client)
+				c := h.Handle(client,data.Data)
 				if c != nil {
 					client = c
 				}

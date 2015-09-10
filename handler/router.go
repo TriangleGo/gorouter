@@ -4,7 +4,7 @@ type Router struct {
 	ConnHandler    ConnectHandler
 	DisconnHandler DisconnectHandler
 	TcpHandler     map[uint8]Handler
-	Ipchandler     map[uint8]Handler
+	IpcHandler     map[uint8]IpcHandler
 }
 
 func NewRouter() *Router {
@@ -23,8 +23,8 @@ func (this *Router) SetTcpHandler(p map[uint8]Handler) {
 	this.TcpHandler = p
 }
 
-func (this *Router) SetIpcHandler(p map[uint8]Handler) {
-	this.Ipchandler = p
+func (this *Router) SetIpcHandler(p map[uint8]IpcHandler) {
+	this.IpcHandler = p
 }
 
 func (this *Router) GetConnHandler() ConnectHandler {
@@ -39,6 +39,6 @@ func (this *Router) GetTcpHandler() map[uint8]Handler {
 	return this.TcpHandler
 }
 
-func (this *Router) GetIpcHandler() map[uint8]Handler {
-	return this.Ipchandler
+func (this *Router) GetIpcHandler() map[uint8]IpcHandler {
+	return this.IpcHandler
 }

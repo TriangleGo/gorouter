@@ -7,8 +7,15 @@ import (
 // protocol handler
 type Handler interface {
 	Init()
-	Handle(client *types.Client) *types.Client
+	Handle(client *types.Client,data []byte) *types.Client
 }
+
+// protocol handler
+type IpcHandler interface {
+	Init()
+	Handle(client *types.Client,data interface{}) *types.Client
+}
+
 
 //some one disconnected
 type DisconnectHandler interface {

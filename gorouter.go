@@ -32,7 +32,7 @@ func main() {
 	socket.LocalAddr()
 	socket.RemoteAddr()
 	socket.SetDeadline(time.Now().Add( time.Second * 10))
-	socket.Write([]byte("abc"))
+	socket.Write([]byte{0,0,0,4,0,0,0,1})
 	socket.Close()
 	fmt.Printf(" remote %v\n",a.RemoteAddr())
 

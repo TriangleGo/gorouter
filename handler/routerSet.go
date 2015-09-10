@@ -25,8 +25,12 @@ func InitRouter() {
 		v.Init()
 	}
 	
+	IpcDispatchs := map[uint8]IpcHandler{
+		
+	}
+	
 	GetRouter().SetTcpHandler(Dispatchs)
-	GetRouter().SetIpcHandler(Dispatchs)
+	GetRouter().SetIpcHandler(IpcDispatchs)
 
 }
 

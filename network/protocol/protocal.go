@@ -31,7 +31,7 @@ func (this *Protocol) ToBytes() []byte {
 }
 
 func (this *Protocol) ParseFromParam(mod uint8, cmd uint8, data []byte) *Protocol {
-	this.Header = PROTOCOL_HEADER + PROTOCOL_MODULE_ID + PROTOCOL_COMMAND + len(data)
+	this.Header = PROTOCOL_MODULE_ID + PROTOCOL_COMMAND + len(data)
 	this.ModuleId = mod
 	this.Command = cmd
 	this.Data = data
@@ -47,7 +47,7 @@ func (this *Protocol) PraseFromData(data []byte, size int) (*Protocol, error) {
 	buffer := simplebuffer.NewSimpleBufferByBytes(data, "bigEndian")
 	//fmt.Printf("data %v \n", buffer.Data())
 	this.Header = int(buffer.ReadUInt32())
-	if this.Header != size {
+	if this.Header + PROTOCOL_HEADER != size {
 		return nil, errors.New("Protocal header size error \n")
 	}
 	//fmt.Printf("data %v \n", buffer.Data())
@@ -55,7 +55,7 @@ func (this *Protocol) PraseFromData(data []byte, size int) (*Protocol, error) {
 	//fmt.Printf("data %v \n", buffer.Data())
 	this.Command = (buffer.ReadUInt8())
 	//fmt.Printf("data %v \n", buffer.Data())
-	this.Data = buffer.ReadData(this.Header - (PROTOCOL_HEADER + PROTOCOL_MODULE_ID + PROTOCOL_COMMAND))
+	this.Data = buffer.ReadData(this.Header - ( PROTOCOL_MODULE_ID + PROTOCOL_COMMAND))
 	//fmt.Printf("header %v id %v command %v data %v", this.Header, this.ModuleId, this.Command, this.Data)
 	return this, nil
 }

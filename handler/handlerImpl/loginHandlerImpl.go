@@ -12,7 +12,7 @@ func (this *LoginHandlerImpl) Init()  {
 	fmt.Printf("LoginHandleImple loaded \n")
 }
 
-func (this *LoginHandlerImpl) Handle(client *types.Client) *types.Client {
-	fmt.Printf("TODO: i am the handler \n")
+func (this *LoginHandlerImpl) Handle(client *types.Client,data []byte) *types.Client {
+	fmt.Printf("TODO: i am the LoginHandlerImpl data =  %v \n",data)
 	return nil
 }

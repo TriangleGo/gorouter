@@ -30,10 +30,10 @@ func NewBaseSocket(conn interface{}) *BaseSocket{
 	fmt.Printf("reflect.TypeOf(conn) %v \n",reflect.TypeOf(conn).String())
 	var stype string
 	switch  conn.(type)  {
-		case  *net.Conn:
+		case  net.Conn:
 			stype = "socket"
 			break
-		case *websocket.Conn:
+		case websocket.Conn:
 			stype = "websocket"
 			break
 		default :
