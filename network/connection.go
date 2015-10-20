@@ -77,7 +77,7 @@ func (this *Connection) serveLoop() {
 }
 
 func (this *Connection) serveHandle() {
-	fmt.Printf("TCPHandle looping tcp \n")
+	logger.Info("TCPHandle looping tcp \n")
 
 	defer this.Conn.Close()
 
