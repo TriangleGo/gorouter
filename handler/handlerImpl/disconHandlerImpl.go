@@ -1,13 +1,13 @@
 package handlerImpl
 
 import (
-	"fmt"
 	"gorouter/types"
+	"gorouter/logger"
 )
 
 type DisconHandlerImpl struct {
 }
 
 func (this *DisconHandlerImpl) Handle(client *types.Client) {
-	fmt.Printf("TODO: i am the handler \n")
+	logger.Info("TODO: i am the handler \n")
 }

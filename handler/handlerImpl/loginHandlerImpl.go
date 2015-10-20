@@ -1,18 +1,18 @@
 package handlerImpl
 
 import (
-	"fmt"
 	"gorouter/types"
+	"gorouter/logger"
 )
 
 type LoginHandlerImpl struct {
 }
 
 func (this *LoginHandlerImpl) Init()  {
-	fmt.Printf("LoginHandleImple loaded \n")
+	logger.Info("LoginHandleImple loaded \n")
 }
 
 func (this *LoginHandlerImpl) Handle(client *types.Client,data []byte) *types.Client {
-	fmt.Printf("TODO: i am the LoginHandlerImpl data =  %v \n",data)
+	logger.Info("TODO: i am the LoginHandlerImpl data =  %v \n",data)
 	return nil
 }

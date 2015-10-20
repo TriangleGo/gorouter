@@ -8,10 +8,10 @@ import (
 	"gorouter/network/simplebuffer"
 	"net"
 	"gorouter/util"
-	"github.com/astaxie/beego/orm"
+	_"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
-	"net/http"
-	"io/ioutil"
+	_"net/http"
+	_"io/ioutil"
 
 )
 
@@ -29,6 +29,7 @@ var (
 
 func main() {
 	
+	/*
 	orm.RegisterDriver("mysql", orm.DR_MySQL)
 	conn := "oa_local" + ":" + `f*(&Dssdsa)s` + "@tcp(" + "127.0.0.1:51816" + ")/" + "db_oa_enterprise" + "?charset=utf8"
 	orm.RegisterDataBase("default", "mysql", conn)
@@ -43,17 +44,19 @@ func main() {
 	fmt.Printf("Get Data %v \n",string(b))
 	
 	return
+	*/
 	
 	for i:=0;i<100;i++ {
 		go newTcpConn()
 		time.Sleep( 10 * time.Second)
 	}
+	newTcpConn()
 }
 
 func newTcpConn() {
 	defer util.TraceCrashStack()
 	fmt.Print("Go Router Client Runing \n")
-	connClient, err := net.Dial("tcp", "127.0.0.1:9993")
+	connClient, err := net.Dial("tcp", "127.0.0.1:9093")
 	if err != nil {
 		fmt.Print("Client Connecting error \n")
 		return
@@ -67,6 +70,7 @@ func newTcpConn() {
 	fmt.Printf("send data %v \n", buffer.Data())
 	connClient.Write(buffer.Data())
 	
+/*
 	sb := simplebuffer.NewSimpleBuffer("bigEndian")
 	chBuffer := make(chan *simplebuffer.SimpleBuffer)
 	
@@ -88,6 +92,7 @@ func newTcpConn() {
 	}
 	
 	fmt.Printf("recv loop exit \n")
+*/
 }
 
 /*pack unpack*/

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"fmt"
 	"gorouter/network"
+	"gorouter/logger"
 	"net"
 	"time"
 )
@@ -27,7 +27,7 @@ func (this *TCPServer) ServerListen() error {
 	var err error
 	this.listener, err = net.Listen(this.protocol, this.dsn)
 	if err != nil {
-		fmt.Printf("TCPServer Start Failed %v \r\n", err)
+		logger.Info("TCPServer Start Failed %v \r\n", err)
 		return err
 	}
 	return nil
@@ -38,7 +38,7 @@ func (this *TCPServer) ServerAccpet() {
 	for {
 		conn, err := this.listener.Accept()
 		if err != nil {
-			fmt.Printf("TCPServer Accepting Failed %v \r\n", err)
+			logger.Info("TCPServer Accepting Failed %v \r\n", err)
 			time.Sleep(time.Second * 10)
 			continue
 		}

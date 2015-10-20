@@ -1,7 +1,6 @@
 package network
 
 import (
-	"fmt"
 	_"net"
 )
 
@@ -24,7 +23,7 @@ func (this *ConnectionManager) Produce(s *BaseSocket) *Connection {
 var connMgr *ConnectionManager
 
 func GetConnectionManager() *ConnectionManager{
-	fmt.Printf("static Manager call \n")
+	//fmt.Printf("static Manager call \n")
 	if connMgr == nil {
 		connMgr = NewConnectionManager() 
 	} 

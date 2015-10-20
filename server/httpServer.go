@@ -1,10 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"gorouter/types"
 	"io"
 	"net/http"
+	"fmt"
 )
 
 type HttpServer struct  {

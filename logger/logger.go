@@ -56,7 +56,7 @@ func (this *Logger) InitFile(logName string) (*os.File,int64) {
 		logFullName := fmt.Sprintf("%s%s_%d%s",this.outputDir,logNameWithDate,i,logExt)
 		fi , err = os.Lstat(logFullName)
 		if err != nil { /* when the file is not exist then create it */
-			fmt.Printf("ERROR %v ",err)
+			//fmt.Printf("ERROR %v ",err)
 			hFile,err = os.Create(logFullName)
 			fmt.Printf("CreateFile err %v \n",err)
 			offset = 0
@@ -126,7 +126,7 @@ func  (this *Logger) SetOutputDir(dir string) {
 }
 
 func (this *Logger)getFileAndLine() (string,int){
-	_, file, line, _ := runtime.Caller(1)
+	_, file, line, _ := runtime.Caller(5)
 	_,filename := filepath.Split(file)
 	return filename,line
 }

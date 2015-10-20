@@ -6,6 +6,7 @@ import (
 	"gorouter/handler"
 	"gorouter/network/protocol"
 	"gorouter/types"
+	"gorouter/logger"
 	_"net"
 )
 
@@ -46,10 +47,12 @@ func (this *Connection) serveLoop() {
 		this.Conn.SetReadDeadline(time.Now().Add( 45 * time.Second))
 		n, err := this.Conn.Read(buf)
 		if err != nil {
-			fmt.Printf("Client Read Buffer Failed %v %v\r\n", err, n)
+			logger.Info("Client Read Buffer Failed %v %v\r\n", err, n)
 			this.ExitChan <- "TCP_CLOSED"
 			break
 		}
+		
+		logger.Info("recv data %v \n",buf[0:n])
 
 		//when the user connected,the first data will not parse to protocol
 		//it will send to the ConnHandler for modify
@@ -66,7 +69,7 @@ func (this *Connection) serveLoop() {
 		proto := protocol.NewProtocal()
 		_, err = proto.PraseFromData(buf[0:n], n)
 		if err != nil {
-			fmt.Printf("Data Parse failed %v\r\n", err)
+			logger.Info("Data Parse failed %v\r\n", err)
 			continue
 		}
 		this.TcpChan <- *proto
@@ -87,7 +90,7 @@ func (this *Connection) serveHandle() {
 	for {
 		select {
 		case data, ok := <-this.TcpChan:
-			fmt.Printf("TCPHandler %v %v\r\n", data, ok)
+			logger.Info("TCPHandler %v %v\r\n", data, ok)
 			h := handler.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,data.Data)
@@ -97,7 +100,7 @@ func (this *Connection) serveHandle() {
 			}
 			break
 		case data, ok := <-this.IpcChan:
-			fmt.Printf("IPCHandler %v %v\r\n", data.Data, ok)
+			logger.Info("IPCHandler %v %v\r\n", data.Data, ok)
 			h := handler.GetRouter().GetIpcHandler()[uint8(data.ModuleId)]
 			if h != nil {
 				c := h.Handle(client,data.Data)
@@ -107,7 +110,7 @@ func (this *Connection) serveHandle() {
 			}
 			break
 		case data, ok := <-this.ExitChan:
-			fmt.Printf("ExitHandler %v %v\r\n", data, ok)
+			logger.Info("ExitHandler %v %v\r\n", data, ok)
 			handler.GetRouter().GetDisconHandler().Handle(client)
 			return
 		}

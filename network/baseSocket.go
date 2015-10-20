@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"golang.org/x/net/websocket"
 	"reflect"
+
 )
 
 /*	 rewrite method 
@@ -27,7 +28,7 @@ type BaseSocket struct {
 
 
 func NewBaseSocket(conn interface{}) *BaseSocket{
-	fmt.Printf("reflect.TypeOf(conn) %v \n",reflect.TypeOf(conn).String())
+	//fmt.Printf("reflect.TypeOf(conn) %v \n",reflect.TypeOf(conn).String())
 	var stype string
 	switch  conn.(type)  {
 		case  net.Conn:
@@ -38,6 +39,7 @@ func NewBaseSocket(conn interface{}) *BaseSocket{
 			break
 		default :
 			fmt.Printf("unknow\n")
+			break
 	}
 
 	return &BaseSocket{socket:conn,socktype:stype}
@@ -46,8 +48,9 @@ func NewBaseSocket(conn interface{}) *BaseSocket{
 
 func (this *BaseSocket) Close() error{
 	in := make([]reflect.Value,0)
-	ret := reflect.ValueOf(this.socket).MethodByName("Close").Call(in)
-	fmt.Printf("ret = %v \n",ret[0].Interface())
+	reflect.ValueOf(this.socket).MethodByName("Close").Call(in)
+	//ret := reflect.ValueOf(this.socket).MethodByName("Close").Call(in)
+	//fmt.Printf("ret = %v \n",ret[0].Interface())
 	return nil
 }
 
