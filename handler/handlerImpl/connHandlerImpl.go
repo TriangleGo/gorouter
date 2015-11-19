@@ -11,6 +11,7 @@ type ConnHandlerImpl struct {
 
 func (this *ConnHandlerImpl) Handle(client *types.Client, ch chan []byte) *types.Client {
 	logger.Info("TODO: i am the conn handler \n")
+	client.GetConn().Write([]byte{0,0,0,2,0,0})
 	select {
 	case res := <-ch:
 		//it handle the data like flash sandbox and other
