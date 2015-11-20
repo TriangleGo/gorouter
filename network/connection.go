@@ -3,8 +3,11 @@ package network
 import (
 	"time"
 	"fmt"
-	"gorouter/handler"
+	_"gorouter/handler"
+	"gorouter/handler/router"
 	"gorouter/network/protocol"
+	"gorouter/network/socket"
+	"gorouter/network/simplebuffer"
 	"gorouter/types"
 	"gorouter/logger"
 	_"net"
@@ -12,7 +15,8 @@ import (
 
 // client.go
 type Connection struct {
-	Conn          *BaseSocket
+	Conn          *socket.BaseSocket
+	PacketChan	  chan []byte
 	TcpChan       chan protocol.Protocol
 	IpcChan       chan types.IPCSolid
 	RpcChan       chan protocol.Protocol
@@ -20,8 +24,9 @@ type Connection struct {
 	FirstDataChan chan []byte
 }
 
-func NewConnection(s *BaseSocket) *Connection {
+func NewConnection(s *socket.BaseSocket) *Connection {
 	return &Connection{Conn: s,
+		PacketChan:    make(chan []byte),
 		IpcChan:       make(chan types.IPCSolid),
 		TcpChan:       make(chan protocol.Protocol),
 		RpcChan:       make(chan protocol.Protocol),
@@ -36,6 +41,7 @@ func (this *Connection) SyncServe() {
 
 func (this *Connection) AsyncServe() {
 	go this.serveLoop()
+	go this.servePacket()
 	go this.serveHandle()
 }
 
@@ -43,11 +49,12 @@ func (this *Connection) serveLoop() {
 	var fristPack = true
 	for {
 		//looping to recv the client
-		buf := make([]byte, 4096)
-		this.Conn.SetReadDeadline(time.Now().Add( 45 * time.Second))
+		buf := make([]byte, 8096)
+		this.Conn.SetReadDeadline(time.Now().Add( 60 * time.Second))
 		n, err := this.Conn.Read(buf)
 		if err != nil {
 			logger.Info("Client Read Buffer Failed %v %v\r\n", err, n)
+			this.ExitChan <- "TCP_CLOSED"
 			this.ExitChan <- "TCP_CLOSED"
 			break
 		}
@@ -64,18 +71,52 @@ func (this *Connection) serveLoop() {
 				this.FirstDataChan <- buf[0:n]
 			}
 		}
+		//end first pack
+		
+		//make the protocal
+		this.PacketChan <- buf[0:n]
 
-		//construct the protocol and send it to the handler
-		proto := protocol.NewProtocal()
-		_, err = proto.PraseFromData(buf[0:n], n)
-		if err != nil {
-			logger.Info("Data Parse failed %v\r\n", err)
-			continue
+	} //end for{}
+}
+
+
+// for handling the packet interrupt
+func (this *Connection) servePacket() {
+	bigBuffer := simplebuffer.NewSimpleBufferBySize("bigEndian",20480) // 2 Mb
+	for {
+		select {
+		case data, ok := <-this.PacketChan:
+			logger.Info("ExitHandler %v %v\r\n", data, ok)
+			// construct the protocal packet
+			bigBuffer.WriteData(data)
+			//construct the protocol and send it to the handler
+			
+			proto := protocol.NewProtocal()
+			_, err := proto.PraseFromData(bigBuffer.Data(), bigBuffer.Size())
+			if err != nil {
+				logger.Info("Data Parse failed \n")
+				logger.Info("Buffer : %v\n\n\n", bigBuffer.Data())
+				continue
+			}
+			//### parse success ! reset all ###
+			bigBuffer = simplebuffer.NewSimpleBufferBySize("bigEndian",20480) // 2 Mb
+			this.TcpChan <- *proto
+			break
+		// Packget goroutine no need Ipc
+		/*
+		case data, ok := <-this.IpcChan:
+			logger.Info("ExitHandler %v %v\r\n", data, ok)
+			break
+		*/
+		case data, ok := <-this.ExitChan:
+			logger.Info("ExitHandler %v %v\r\n", data, ok)
+			return
 		}
-		this.TcpChan <- *proto
 	}
 }
 
+
+// into the handler
 func (this *Connection) serveHandle() {
 	logger.Info("TCPHandle looping tcp \n")
 
@@ -84,14 +125,14 @@ func (this *Connection) serveHandle() {
 	client := types.NewClient(this.Conn)
 
 	//serve when connect
-	go handler.GetRouter().ConnHandler.Handle(client, this.FirstDataChan)
+	go router.GetRouter().ConnHandler.Handle(client, this.FirstDataChan)
 
 	//loop recv protocol
 	for {
 		select {
 		case data, ok := <-this.TcpChan:
 			logger.Info("TCPHandler %v %v\r\n", data, ok)
-			h := handler.GetRouter().GetTcpHandler()[data.ModuleId]
+			h := router.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,data.Data)
 				if c != nil {
@@ -101,7 +142,7 @@ func (this *Connection) serveHandle() {
 			break
 		case data, ok := <-this.IpcChan:
 			logger.Info("IPCHandler %v %v\r\n", data.Data, ok)
-			h := handler.GetRouter().GetIpcHandler()[uint8(data.ModuleId)]
+			h := router.GetRouter().GetIpcHandler()[uint8(data.ModuleId)]
 			if h != nil {
 				c := h.Handle(client,data.Data)
 				if c != nil {
@@ -111,7 +152,7 @@ func (this *Connection) serveHandle() {
 			break
 		case data, ok := <-this.ExitChan:
 			logger.Info("ExitHandler %v %v\r\n", data, ok)
-			handler.GetRouter().GetDisconHandler().Handle(client)
+			router.GetRouter().GetDisconHandler().Handle(client)
 			return
 		}
 	}

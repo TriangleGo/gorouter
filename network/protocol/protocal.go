@@ -43,19 +43,20 @@ func (this *Protocol) PraseFromData(data []byte, size int) (*Protocol, error) {
 		return nil, errors.New("Buffer size is too small to protocal size")
 	}
 
-	//fmt.Printf("data %v \n", data)
-	buffer := simplebuffer.NewSimpleBufferByBytes(data, "bigEndian")
-	//fmt.Printf("data %v \n", buffer.Data())
+	//don't use the src point
+	//make a copy with the input data
+	dataCopy := make([]byte,size)
+	copy(dataCopy,data)
+	
+	buffer := simplebuffer.NewSimpleBufferByBytes(dataCopy, "bigEndian")
 	this.Header = int(buffer.ReadUInt32())
 	if this.Header + PROTOCOL_HEADER != size {
 		return nil, errors.New("Protocal header size error \n")
 	}
-	//fmt.Printf("data %v \n", buffer.Data())
-	this.ModuleId = (buffer.ReadUInt8())
-	//fmt.Printf("data %v \n", buffer.Data())
+	
+	this.ModuleId = (buffer.ReadUInt8())	
 	this.Command = (buffer.ReadUInt8())
-	//fmt.Printf("data %v \n", buffer.Data())
 	this.Data = buffer.ReadData(this.Header - ( PROTOCOL_MODULE_ID + PROTOCOL_COMMAND))
-	//fmt.Printf("header %v id %v command %v data %v", this.Header, this.ModuleId, this.Command, this.Data)
+	
 	return this, nil
 }

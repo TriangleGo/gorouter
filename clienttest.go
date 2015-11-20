@@ -45,11 +45,11 @@ func main() {
 	
 	return
 	*/
-	
+	/*
 	for i:=0;i<100;i++ {
 		go newTcpConn()
 		time.Sleep( 10 * time.Second)
-	}
+	}*/
 	newTcpConn()
 }
 
@@ -63,13 +63,18 @@ func newTcpConn() {
 	}
 
 	buffer := simplebuffer.NewSimpleBuffer("bigEndian")
-	buffer.WriteUInt32(0x3) //len
-	buffer.WriteUInt8(0x80)
+	buffer.WriteUInt32(49) //len
 	buffer.WriteUInt8(1)
+	buffer.WriteUInt8(2)
 	buffer.WriteData([]byte("0")) 
 	fmt.Printf("send data %v \n", buffer.Data())
 	connClient.Write(buffer.Data())
 	
+	for i:=0;i<10;i++{
+		time.Sleep(1 * time.Second)
+		connClient.Write(buffer.Data())
+	}
+
 /*
 	sb := simplebuffer.NewSimpleBuffer("bigEndian")
 	chBuffer := make(chan *simplebuffer.SimpleBuffer)

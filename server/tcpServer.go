@@ -1,6 +1,7 @@
 package server
 
 import (
+	"gorouter/network/socket"
 	"gorouter/network"
 	"gorouter/logger"
 	"net"
@@ -43,7 +44,7 @@ func (this *TCPServer) ServerAccpet() {
 			continue
 		}
 		//接收数据
-		network.GetConnectionManager().Produce(network.NewBaseSocket(conn)).AsyncServe()
+		network.GetConnectionManager().Produce(socket.NewBaseSocket(conn)).AsyncServe()
 		//this.connManager.Produce(&conn).Serve()
 	}
 

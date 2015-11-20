@@ -16,6 +16,11 @@ type SimpleBuffer struct {
 func NewSimpleBuffer(byteorder string) *SimpleBuffer {
 	return &SimpleBuffer{data: make([]byte, 8192), size: 8192, endian: byteorder}
 }
+
+func NewSimpleBufferBySize(byteorder string,size int) *SimpleBuffer {
+	return &SimpleBuffer{data: make([]byte, size), size: size, endian: byteorder}
+}
+
 func NewSimpleBufferByBytes(d []byte, byteorder string) *SimpleBuffer {
 	return &SimpleBuffer{data: d, size: len(d), offset: len(d), endian: byteorder}
 }

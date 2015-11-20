@@ -3,7 +3,8 @@ package server
 import (
 	_"io"
 	"net/http"
-	"gorouter/network"	    	
+	"gorouter/network/socket"	    	
+	"gorouter/network"	   
 	"gorouter/logger"
 	"golang.org/x/net/websocket"
 )
@@ -17,7 +18,7 @@ func WsServerProc(ws *websocket.Conn) {
 	logger.Info("wsserver connection \n")
 	// conn starting
 	network.GetConnectionManager().
-		Produce(network.NewBaseSocket(ws)).SyncServe()
+		Produce(socket.NewBaseSocket(ws)).SyncServe()
 }
 
 // This example demonstrates a trivial echo server.

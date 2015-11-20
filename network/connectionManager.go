@@ -2,6 +2,7 @@ package network
 
 import (
 	_"net"
+	"gorouter/network/socket"
 )
 
 type ConnectionManager struct {
@@ -12,7 +13,7 @@ func NewConnectionManager() *ConnectionManager {
 	return &ConnectionManager{}
 }
 
-func (this *ConnectionManager) Produce(s *BaseSocket) *Connection {
+func (this *ConnectionManager) Produce(s *socket.BaseSocket) *Connection {
 	connection := NewConnection(s)
 	return connection
 }
