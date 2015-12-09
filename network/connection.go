@@ -98,7 +98,7 @@ func (this *Connection) servePacket() {
 				logger.Info("Buffer : %v\n\n\n", bigBuffer.Data())
 				continue
 			}
-			//### parse success ! reset all ###
+			//### parse success ! reset all ### 
 			bigBuffer = simplebuffer.NewSimpleBufferBySize("bigEndian",20480) // 2 Mb
 			this.TcpChan <- *proto
 			break
