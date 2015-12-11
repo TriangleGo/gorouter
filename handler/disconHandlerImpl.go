@@ -2,12 +2,12 @@ package handler
 
 import (
 	"gorouter/logger"
-	"gorouter/types"
+	"gorouter/handler/client"
 )
 
 type DisconHandlerImpl struct {
 }
 
-func (this *DisconHandlerImpl) Handle(client *types.Client) {
+func (this *DisconHandlerImpl) Handle(client *client.Client) {
 	logger.Info("TODO: i am the handler \n")
 }

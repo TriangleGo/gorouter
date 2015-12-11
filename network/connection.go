@@ -4,12 +4,12 @@ import (
 	"time"
 	"fmt"
 	_"gorouter/handler"
-	"gorouter/handler/router"
+	"gorouter/router"
 	"gorouter/network/protocol"
 	"gorouter/network/socket"
 	"gorouter/network/simplebuffer"
-	"gorouter/types"
 	"gorouter/logger"
+	"gorouter/handler/client"
 	_"net"
 )
 
@@ -18,7 +18,7 @@ type Connection struct {
 	Conn          *socket.BaseSocket
 	PacketChan	  chan []byte
 	TcpChan       chan protocol.Protocol
-	IpcChan       chan types.IPCSolid
+	IpcChan       chan protocol.IPCProtocol
 	RpcChan       chan protocol.Protocol
 	ExitChan      chan string
 	FirstDataChan chan []byte
@@ -27,7 +27,7 @@ type Connection struct {
 func NewConnection(s *socket.BaseSocket) *Connection {
 	return &Connection{Conn: s,
 		PacketChan:    make(chan []byte),
-		IpcChan:       make(chan types.IPCSolid),
+		IpcChan:       make(chan protocol.IPCProtocol),
 		TcpChan:       make(chan protocol.Protocol),
 		RpcChan:       make(chan protocol.Protocol),
 		ExitChan:      make(chan string),
@@ -122,7 +122,7 @@ func (this *Connection) serveHandle() {
 
 	defer this.Conn.Close()
 
-	client := types.NewClient(this.Conn)
+	client := client.NewClient(this.Conn)
 
 	//serve when connect
 	go router.GetRouter().ConnHandler.Handle(client, this.FirstDataChan)
@@ -134,7 +134,7 @@ func (this *Connection) serveHandle() {
 			logger.Info("TCPHandler %v %v\r\n", data, ok)
 			h := router.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
-				c := h.Handle(client,data.Data)
+				c := h.Handle(client,&data)
 				if c != nil {
 					client = c
 				}
