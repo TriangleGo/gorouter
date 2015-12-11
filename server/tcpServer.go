@@ -4,6 +4,7 @@ import (
 	"gorouter/network/socket"
 	"gorouter/network"
 	"gorouter/logger"
+	"gorouter/util"
 	"net"
 	"time"
 )
@@ -35,6 +36,7 @@ func (this *TCPServer) ServerListen() error {
 }
 
 func (this *TCPServer) ServerAccpet() {
+	defer util.TraceCrashStack()
 	//循环接收Accept
 	for {
 		conn, err := this.listener.Accept()

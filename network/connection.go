@@ -10,6 +10,7 @@ import (
 	"gorouter/network/simplebuffer"
 	"gorouter/logger"
 	"gorouter/handler/client"
+	"gorouter/util"
 	_"net"
 )
 
@@ -46,6 +47,7 @@ func (this *Connection) AsyncServe() {
 }
 
 func (this *Connection) serveLoop() {
+	defer util.TraceCrashStack()
 	var fristPack = true
 	for {
 		//looping to recv the client
@@ -82,6 +84,7 @@ func (this *Connection) serveLoop() {
 
 // for handling the packet interrupt
 func (this *Connection) servePacket() {
+	defer util.TraceCrashStack()
 	bigBuffer := simplebuffer.NewSimpleBufferBySize("bigEndian",20480) // 2 Mb
 	for {
 		select {
@@ -118,6 +121,7 @@ func (this *Connection) servePacket() {
 
 // into the handler
 func (this *Connection) serveHandle() {
+	defer util.TraceCrashStack()
 	logger.Info("TCPHandle looping tcp \n")
 
 	defer this.Conn.Close()
