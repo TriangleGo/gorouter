@@ -58,7 +58,7 @@ func (this *Logger) InitFile(logName string) (*os.File,int64) {
 		if err != nil { /* when the file is not exist then create it */
 			//fmt.Printf("ERROR %v ",err)
 			hFile,err = os.Create(logFullName)
-			fmt.Printf("CreateFile err %v \n",err)
+			//fmt.Printf("CreateFile err %v \n",err)
 			offset = 0
 			break
 		} else { /* file is exist and go on using it */

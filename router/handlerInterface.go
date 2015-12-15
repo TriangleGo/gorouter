@@ -1,7 +1,7 @@
 package router
 
 import (
-	"gorouter/handler/client"
+	"gorouter/client"
 	"gorouter/network/protocol"
 )
 

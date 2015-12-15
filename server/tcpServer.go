@@ -3,26 +3,26 @@ package server
 import (
 	"gorouter/network/socket"
 	"gorouter/network"
+	"gorouter/router"
 	"gorouter/logger"
 	"gorouter/util"
 	"net"
 	"time"
 )
 
-//**************************************
-//   tcp 服务器
-//**************************************
 
+//   tcp Server
 type TCPServer struct {
 	dsn         string //127.0.0.1:port
 	protocol    string //tcp
 	listener    net.Listener
-	
+	router	*router.Router
 }
 
 func NewTCPServer(_protocol string, _dsn string) *TCPServer {
 	return &TCPServer{protocol: _protocol,
-		dsn:         _dsn}
+		dsn:         _dsn,
+		router: router.NewRouter()}
 }
 
 func (this *TCPServer) ServerListen() error {
@@ -35,21 +35,8 @@ func (this *TCPServer) ServerListen() error {
 	return nil
 }
 
-func (this *TCPServer) ServerAccpet() {
-	defer util.TraceCrashStack()
-	//循环接收Accept
-	for {
-		conn, err := this.listener.Accept()
-		if err != nil {
-			logger.Info("TCPServer Accepting Failed %v \r\n", err)
-			time.Sleep(time.Second * 10)
-			continue
-		}
-		//接收数据
-		network.GetConnectionManager().Produce(socket.NewBaseSocket(conn)).AsyncServe()
-		//this.connManager.Produce(&conn).Serve()
-	}
-
+func (this *TCPServer) GetRouter() *router.Router {
+	return router.GetRouter()
 }
 
 func (this *TCPServer) Run() {
@@ -57,4 +44,22 @@ func (this *TCPServer) Run() {
 		return
 	}
 	go this.ServerAccpet()
+}
+
+
+func (this *TCPServer) ServerAccpet() {
+	defer util.TraceCrashStack()
+	//Looping Accept
+	for {
+		conn, err := this.listener.Accept()
+		if err != nil {
+			logger.Info("TCPServer Accepting Failed %v \r\n", err)
+			time.Sleep(time.Second * 10)
+			continue
+		}
+		// recv data
+		network.GetConnectionManager().Produce(socket.NewBaseSocket(conn)).AsyncServe()
+		//this.connManager.Produce(&conn).Serve()
+	}
+
 }

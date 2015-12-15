@@ -1,46 +1,27 @@
 package router
 
 import (
-	"gorouter/handler"
+	_"gorouter/handler"
 )
 
-var _router *Router
+var _global_router *Router
 
-func InitRouter() {
-	if _router != nil {
-		return
+func InitRouter() *Router {
+	if _global_router != nil {
+		return _global_router
 	}
-	_router = NewRouter()
-
-	//setup handler
-	GetRouter().SetConnHandler(&handler.ConnHandlerImpl{})
-	GetRouter().SetDisconHandler(&handler.DisconHandlerImpl{})
-
-	//register handler
-	Dispatchs := map[uint8]Handler{
-		0: &handler.LoginHandlerImpl{},
-	}
-	// register ipc handler
-	IpcDispatchs := map[uint8]IpcHandler{
-		
-	}
+	_global_router = NewRouter()
+	
 	//init all module	
-	for _,v := range Dispatchs {
-		v.Init()
-	}
-	for _,v := range IpcDispatchs {
-		v.Init()
-	}
-	
-	
-	GetRouter().SetTcpHandler(Dispatchs)
-	GetRouter().SetIpcHandler(IpcDispatchs)
+	GetRouter().Init()
+
+	return _global_router
 
 }
 
 func GetRouter() *Router {
-	if _router == nil {
-		InitRouter()
+	if _global_router == nil {
+		_global_router = NewRouter()
 	}
-	return _router
+	return _global_router
 }

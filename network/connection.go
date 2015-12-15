@@ -9,8 +9,9 @@ import (
 	"gorouter/network/socket"
 	"gorouter/network/simplebuffer"
 	"gorouter/logger"
-	"gorouter/handler/client"
+	"gorouter/client"
 	"gorouter/util"
+	"gorouter/util/hash"
 	_"net"
 )
 
@@ -34,6 +35,13 @@ func NewConnection(s *socket.BaseSocket) *Connection {
 		ExitChan:      make(chan string),
 		FirstDataChan: make(chan []byte, 1024)}
 }
+
+func (this *Connection) GetHash() string {
+	sId := fmt.Sprintf("%x%x%x%x",&this.Conn,&this.IpcChan,&this.TcpChan,&this.RpcChan)
+	C32 := hash.HashC32([]byte(sId))
+	return fmt.Sprintf("%x",C32)
+}
+
 
 func (this *Connection) SyncServe() {
 	this.serveLoop()

@@ -3,13 +3,15 @@ package handler
 import (
 	"time"
 	"gorouter/logger"
-	"gorouter/handler/client"
+	"gorouter/client"
+	"gorouter/util"
 )
 
 type ConnHandlerImpl struct {
 }
 
 func (this *ConnHandlerImpl) Handle(client *client.Client, ch chan []byte) *client.Client {
+	go util.TraceCrashStack()
 	logger.Info("TODO: i am the conn handler \n")
 	/*client.GetConn().Write([]byte{0,0,0,2,0,0})*/
 	select {

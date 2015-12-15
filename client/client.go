@@ -22,3 +22,4 @@ func (this *Client) GetConn() *socket.BaseSocket {
 func (this *Client) Send(CMD1 uint8,CMD2 uint8,Data []byte) {
 	
 }
+

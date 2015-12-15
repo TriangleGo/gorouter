@@ -42,3 +42,12 @@ func (this *Router) GetTcpHandler() map[uint8]Handler {
 func (this *Router) GetIpcHandler() map[uint8]IpcHandler {
 	return this.IpcHandler
 }
+
+func (this *Router) Init()  {
+	for _,v := range this.TcpHandler {
+		v.Init()
+	}
+	for _,v := range this.IpcHandler {
+		v.Init()
+	}
+}

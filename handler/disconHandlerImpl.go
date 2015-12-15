@@ -2,7 +2,7 @@ package handler
 
 import (
 	"gorouter/logger"
-	"gorouter/handler/client"
+	"gorouter/client"
 )
 
 type DisconHandlerImpl struct {

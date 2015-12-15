@@ -2,7 +2,7 @@ package handler
 
 import (
 	"gorouter/logger"
-	"gorouter/handler/client"
+	"gorouter/client"
 	"gorouter/network/protocol"
 	"gorouter/util"
 )
@@ -16,6 +16,14 @@ func (this *LoginHandlerImpl) Init()  {
 
 func (this *LoginHandlerImpl) Handle(client *client.Client,data *protocol.Protocol) *client.Client {
 	defer util.TraceCrashStack()
-	logger.Info("TODO: i am the LoginHandlerImpl data =  %v \n",data)
+	logger.Info("TODO: LoginHandlerImpl data =  %v \n",data)
+	switch(data.Command) {
+		case 0:
+			//TODO:
+			break
+		default:
+			//TODO:
+			break
+	}
 	return nil
 }

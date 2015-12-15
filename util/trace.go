@@ -1,7 +1,6 @@
 package util
 
 import (
-	"log"
 	"runtime"
 	"gorouter/logger"
 )
@@ -15,6 +14,5 @@ func TraceCrashStack() {
 				logger.Error("[%v][%s:%v]\n", runtime.FuncForPC(_fn).Name(), _file, _line)
 			}
 		}
-
 	}
 }
