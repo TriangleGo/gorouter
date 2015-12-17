@@ -6,7 +6,8 @@ import (
 	"gorouter/network/socket"	    	
 	"gorouter/network"	   
 	"gorouter/logger"
-	"golang.org/x/net/websocket"
+	//copy file golang.org/x/net/websocket
+	"gorouter/lib/websocket"
 )
 
 type WebSocketServer struct {

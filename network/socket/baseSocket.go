@@ -5,7 +5,7 @@ import (
 	"time"
 	"net"
 	"fmt"
-	"golang.org/x/net/websocket"
+	"gorouter/lib/websocket"
 	"reflect"
 
 )
