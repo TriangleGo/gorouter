@@ -36,30 +36,81 @@ func NewConnection(s *socket.BaseSocket) *Connection {
 		FirstDataChan: make(chan []byte, 1024)}
 }
 
+//transform the conection to hash ( using in map[]session )
 func (this *Connection) GetHash() string {
 	sId := fmt.Sprintf("%x%x%x%x",&this.Conn,&this.IpcChan,&this.TcpChan,&this.RpcChan)
 	C32 := hash.HashC32([]byte(sId))
 	return fmt.Sprintf("%x",C32)
 }
 
-
+//will block the accept thread
 func (this *Connection) SyncServe() {
 	this.serveLoop()
 	go this.serveHandle()
 }
 
+//will not block the accept thread
 func (this *Connection) AsyncServe() {
 	go this.serveLoop()
 	go this.servePacket()
 	go this.serveHandle()
 }
 
+//specify websocket 
+func (this *Connection) WSServe() {
+	client := client.NewClient(this.Conn)
+	const packsize = 8192
+	for {
+		var padding []byte
+		buf := make([]byte,8192)
+		//no heartbeat after 60s will disconnect
+		this.Conn.SetReadDeadline(time.Now().Add( 60 * time.Second))
+		n,err := this.Conn.Read(buf)
+		if n >= packsize {
+			tmpBuff := make([]byte,20480)
+			tn,_ := this.Conn.Read(tmpBuff)
+			if tn > 20480 {
+				continue
+			}
+			padding = make([]byte,tn+n)
+			copy(padding[0:],buf)
+			copy(padding[n:],tmpBuff)
+			n = n+tn
+		} else {
+			padding = buf
+		}
+		logger.Info("websocket read size %v data %v\n",n,padding[0:n])
+		if err != nil {
+			return
+		}
+		//parse data in json
+		wp,err := protocol.NewWsProtocolFromData(padding[0:n])
+		if err != nil {
+			continue
+		}
+		//get handler 
+		logger.Info("handle module:%v command:%v data:%v \n",wp.Module,wp.Command,string(wp.Data))
+		h := router.GetRouter().GetWsHandler()[wp.Module]
+		if h == nil {
+			logger.Info("can't find module: '%v' \n",wp.Module)
+			continue
+		}
+		//handle data
+		c := h.Handle(client,wp.Command,string(wp.Data))
+		if c != nil {
+			client = c
+		}
+		//end
+	}
+}
+
+// recving the data from socket
 func (this *Connection) serveLoop() {
 	defer util.TraceCrashStack()
 	var fristPack = true
 	for {
 		//looping to recv the client
-		buf := make([]byte, 8096)
+		buf := make([]byte, 8192)
 		this.Conn.SetReadDeadline(time.Now().Add( 60 * time.Second))
 		n, err := this.Conn.Read(buf)
 		if err != nil {
@@ -93,13 +144,18 @@ func (this *Connection) serveLoop() {
 // for handling the packet interrupt
 func (this *Connection) servePacket() {
 	defer util.TraceCrashStack()
-	bigBuffer := simplebuffer.NewSimpleBufferBySize("bigEndian",20480) // 2 Mb
+	const packsize = 20480
+	bigBuffer := simplebuffer.NewSimpleBufferBySize("bigEndian",packsize) // 2 Mb
 	for {
 		select {
 		case data, ok := <-this.PacketChan:
 			logger.Info("ExitHandler %v %v\r\n", data, ok)
 			// construct the protocal packet
-			bigBuffer.WriteData(data)
+			if len(bigBuffer.Data()) + len(data) > packsize {
+				//block this pack
+			} else {
+				bigBuffer.WriteData(data)
+			}
 			//construct the protocol and send it to the handler
 			
 			proto := protocol.NewProtocal()
@@ -110,7 +166,7 @@ func (this *Connection) servePacket() {
 				continue
 			}
 			//### parse success ! reset all ### 
-			bigBuffer = simplebuffer.NewSimpleBufferBySize("bigEndian",20480) // 2 Mb
+			bigBuffer = simplebuffer.NewSimpleBufferBySize("bigEndian",packsize) // 2 Mb
 			this.TcpChan <- *proto
 			break
 		// Packget goroutine no need Ipc

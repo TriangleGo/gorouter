@@ -11,12 +11,17 @@ type Handler interface {
 	Handle(client *client.Client,data *protocol.Protocol) *client.Client
 }
 
+// websocket protocol handler
+type WSHandler interface {
+	Init()
+	Handle(client *client.Client,command string,data string) *client.Client
+}
+
 // protocol handler
 type IpcHandler interface {
 	Init()
 	Handle(client *client.Client,data interface{}) *client.Client
 }
-
 
 //some one disconnected
 type DisconnectHandler interface {

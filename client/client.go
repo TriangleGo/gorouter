@@ -2,6 +2,7 @@ package client
 
 import (
 	"gorouter/network/socket"
+	"gorouter/network/protocol"
 )
 
 type Client struct {
@@ -20,6 +21,12 @@ func (this *Client) GetConn() *socket.BaseSocket {
 }
 
 func (this *Client) Send(CMD1 uint8,CMD2 uint8,Data []byte) {
+	dat := protocol.NewProtocalByParams(CMD1,CMD2,Data).ToBytes()
+	this.conn.Write(dat)
+}
+
+func (this *Client) WsSend( module,command,data string ) {
 	
 }
+
 

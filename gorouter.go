@@ -51,7 +51,15 @@ func main() {
 	logger.Info("Go run HTTPServer \r\n")
 	server.NewHTTPServer(":9091").Run()
 	logger.Info("Go run WSServer \r\n")
-	server.NewWSServer(":9092").Run()
+	
+	wsServer := server.NewWSServer(":9092")
+	//register handler
+	wsServer.GetRouter().SetTcpHandler(map[string]router.WSHandler{
+		"system": &handler.LoginHandlerImpl{},
+		"user": &handler.LoginHandlerImpl{},
+		"chat": &handler.LoginHandlerImpl{},
+	})
+	
 	/*
 	a ,_:= net.Dial("tcp","127.0.0.1:9093")
 	logger.Info(" remote %v\n",a.RemoteAddr())

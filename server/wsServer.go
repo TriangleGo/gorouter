@@ -8,6 +8,7 @@ import (
 	"gorouter/logger"
 	//copy file golang.org/x/net/websocket
 	"gorouter/lib/websocket"
+	"gorouter/router"
 )
 
 type WebSocketServer struct {
@@ -19,7 +20,7 @@ func WsServerProc(ws *websocket.Conn) {
 	logger.Info("wsserver connection \n")
 	// conn starting
 	network.GetConnectionManager().
-		Produce(socket.NewBaseSocket(ws)).SyncServe()
+		Produce(socket.NewBaseSocket(ws)).WSServe()
 }
 
 // This example demonstrates a trivial echo server.
@@ -36,4 +37,8 @@ func (this *WebSocketServer) Run() {
 			panic("ListenAndServe: " + err.Error())
 	    	}
 	}()
+}
+
+func (this *WebSocketServer) GetRouter() *router.Router{
+	return router.GetRouter()
 }

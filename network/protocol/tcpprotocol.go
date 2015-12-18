@@ -20,6 +20,10 @@ func NewProtocal() *Protocol {
 	return &Protocol{}
 }
 
+func NewProtocalByParams(m,c uint8,d []byte) *Protocol {
+	return &Protocol{Header:len(d) + PR_MID + PR_CID, ModuleId:m,Command:c,Data:d}
+}
+
 func (this *Protocol) ToBytes() []byte {
 	buffer := simplebuffer.NewSimpleBuffer("bigEndian")
 
