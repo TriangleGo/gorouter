@@ -40,7 +40,7 @@ func main() {
 		0x2: &handler.LoginHandlerImpl{},
 	})
 	//register Ipc handler
-	tcpServer.GetRouter().SetIpcHandler(map[uint8]router.IpcHandler{
+	tcpServer.GetRouter().SetIpcHandler(map[string]router.IpcHandler{
 		
 	})
 	
@@ -54,11 +54,14 @@ func main() {
 	
 	wsServer := server.NewWSServer(":9092")
 	//register handler
-	wsServer.GetRouter().SetTcpHandler(map[string]router.WSHandler{
-		"system": &handler.LoginHandlerImpl{},
-		"user": &handler.LoginHandlerImpl{},
-		"chat": &handler.LoginHandlerImpl{},
+	wsServer.GetRouter().SetWsHandler(map[string]router.WSHandler{
+		"system": &handler.WsUserHandlerImpl{},
+		"user": &handler.WsUserHandlerImpl{},
+		"chat": &handler.WsUserHandlerImpl{},
 	})
+	
+	//startup
+	wsServer.Run()
 	
 	/*
 	a ,_:= net.Dial("tcp","127.0.0.1:9093")

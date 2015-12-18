@@ -20,6 +20,7 @@ type Connection struct {
 	Conn          *socket.BaseSocket
 	PacketChan	  chan []byte
 	TcpChan       chan protocol.Protocol
+	WsChan       chan protocol.WsProtocol
 	IpcChan       chan protocol.IPCProtocol
 	RpcChan       chan protocol.Protocol
 	ExitChan      chan string
@@ -31,6 +32,7 @@ func NewConnection(s *socket.BaseSocket) *Connection {
 		PacketChan:    make(chan []byte),
 		IpcChan:       make(chan protocol.IPCProtocol),
 		TcpChan:       make(chan protocol.Protocol),
+		WsChan:       make(chan protocol.WsProtocol),
 		RpcChan:       make(chan protocol.Protocol),
 		ExitChan:      make(chan string),
 		FirstDataChan: make(chan []byte, 1024)}
@@ -56,53 +58,6 @@ func (this *Connection) AsyncServe() {
 	go this.serveHandle()
 }
 
-//specify websocket 
-func (this *Connection) WSServe() {
-	client := client.NewClient(this.Conn)
-	const packsize = 8192
-	for {
-		var padding []byte
-		buf := make([]byte,8192)
-		//no heartbeat after 60s will disconnect
-		this.Conn.SetReadDeadline(time.Now().Add( 60 * time.Second))
-		n,err := this.Conn.Read(buf)
-		if n >= packsize {
-			tmpBuff := make([]byte,20480)
-			tn,_ := this.Conn.Read(tmpBuff)
-			if tn > 20480 {
-				continue
-			}
-			padding = make([]byte,tn+n)
-			copy(padding[0:],buf)
-			copy(padding[n:],tmpBuff)
-			n = n+tn
-		} else {
-			padding = buf
-		}
-		logger.Info("websocket read size %v data %v\n",n,padding[0:n])
-		if err != nil {
-			return
-		}
-		//parse data in json
-		wp,err := protocol.NewWsProtocolFromData(padding[0:n])
-		if err != nil {
-			continue
-		}
-		//get handler 
-		logger.Info("handle module:%v command:%v data:%v \n",wp.Module,wp.Command,string(wp.Data))
-		h := router.GetRouter().GetWsHandler()[wp.Module]
-		if h == nil {
-			logger.Info("can't find module: '%v' \n",wp.Module)
-			continue
-		}
-		//handle data
-		c := h.Handle(client,wp.Command,string(wp.Data))
-		if c != nil {
-			client = c
-		}
-		//end
-	}
-}
 
 // recving the data from socket
 func (this *Connection) serveLoop() {
@@ -115,8 +70,8 @@ func (this *Connection) serveLoop() {
 		n, err := this.Conn.Read(buf)
 		if err != nil {
 			logger.Info("Client Read Buffer Failed %v %v\r\n", err, n)
-			this.ExitChan <- "TCP_CLOSED"
-			this.ExitChan <- "TCP_CLOSED"
+			this.ExitChan <- err.Error()
+			this.ExitChan <- err.Error()
 			break
 		}
 		
@@ -210,7 +165,98 @@ func (this *Connection) serveHandle() {
 			break
 		case data, ok := <-this.IpcChan:
 			logger.Info("IPCHandler %v %v\r\n", data.Data, ok)
-			h := router.GetRouter().GetIpcHandler()[uint8(data.ModuleId)]
+			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
+			if h != nil {
+				c := h.Handle(client,data.Data)
+				if c != nil {
+					client = c
+				}
+			}
+			break
+		case data, ok := <-this.ExitChan:
+			logger.Info("ExitHandler %v %v\r\n", data, ok)
+			router.GetRouter().GetDisconHandler().Handle(client)
+			return
+		}
+	}
+
+	fmt.Printf("ServeHandle ending \n")
+}
+
+
+
+//specify websocket 
+func (this *Connection) WSServe() {
+	// init handle
+	go this.serveWsHandle()
+	// parse data
+	const packsize = 8192
+	for {
+		var padding []byte
+		buf := make([]byte,packsize)
+		//no heartbeat after 60s will disconnect
+		this.Conn.SetReadDeadline(time.Now().Add( 60 * time.Second))
+		n,err := this.Conn.Read(buf)
+		// error handle 
+		if err != nil {
+			this.ExitChan <- err.Error()
+		}
+		// pack handle
+		if n >= packsize {
+			tmpBuff := make([]byte,20480)
+			tn,_ := this.Conn.Read(tmpBuff)
+			if tn > 20480 {
+				continue
+			}
+			padding = make([]byte,tn+n)
+			copy(padding[0:],buf)
+			copy(padding[n:],tmpBuff)
+			n = n+tn
+		} else {
+			padding = buf
+		}
+		logger.Info("websocket read size %v data %v\n",n,padding[0:n])
+		if err != nil {
+			return
+		}
+		//parse data in json
+		wp,err := protocol.NewWsProtocolFromData(padding[0:n])
+		if err != nil {
+			continue
+		}
+		//pass value to handle goroutine
+		this.WsChan <- *wp
+	}
+}
+
+
+func (this *Connection) serveWsHandle() {
+	defer util.TraceCrashStack()
+	logger.Info("Websocket handle looping tcp \n")
+
+	defer this.Conn.Close()
+
+	client := client.NewClient(this.Conn)
+
+	//serve when connect
+	go router.GetRouter().ConnHandler.Handle(client, this.FirstDataChan)
+
+	//loop recv protocol
+	for {
+		select {
+		case wp, _ := <-this.WsChan:
+			//get handler 
+			logger.Info("handle module:%v command:%v data:%v \n",wp.Module,wp.Command,string(wp.Data))
+			h := router.GetRouter().GetWsHandler()[wp.Module]
+			if h != nil {
+				c := h.Handle(client,wp.Command,string(wp.Module))
+				if c != nil {
+					client = c
+				}
+			}
+		case data, ok := <-this.IpcChan:
+			logger.Info("IPCHandler %v %v\r\n", data.Data, ok)
+			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,data.Data)
 				if c != nil {

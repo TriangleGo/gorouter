@@ -4,7 +4,7 @@ type Router struct {
 	ConnHandler    ConnectHandler
 	DisconnHandler DisconnectHandler
 	TcpHandler     map[uint8]Handler
-	IpcHandler     map[uint8]IpcHandler
+	IpcHandler     map[string]IpcHandler
 	/*WebSocket handler*/
 	WsHandler     map[string]WSHandler
 }
@@ -29,7 +29,7 @@ func (this *Router) SetWsHandler(p map[string]WSHandler) {
 	this.WsHandler = p
 }
 
-func (this *Router) SetIpcHandler(p map[uint8]IpcHandler) {
+func (this *Router) SetIpcHandler(p map[string]IpcHandler) {
 	this.IpcHandler = p
 }
 
@@ -49,7 +49,7 @@ func (this *Router) GetWsHandler() map[string]WSHandler {
 	return this.WsHandler
 }
 
-func (this *Router) GetIpcHandler() map[uint8]IpcHandler {
+func (this *Router) GetIpcHandler() map[string]IpcHandler {
 	return this.IpcHandler
 }
 

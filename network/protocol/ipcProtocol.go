@@ -2,8 +2,8 @@ package protocol
 
 
 type IPCProtocol struct {
-	ModuleId int
-	CommandId int
+	ModuleId string
+	CommandId string
 	Data interface{}
 	RetChan interface{}
 }
