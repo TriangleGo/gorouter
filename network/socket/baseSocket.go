@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"gorouter/lib/websocket"
 	"reflect"
+	"gorouter/util/hash"
 
 )
 
@@ -122,4 +123,10 @@ func (this *BaseSocket) Write(b []byte) (n int, err error){
 		return (ret[0].Interface()).(int),nil 
 	}
 	return (ret[0].Interface()).(int),(ret[1].Interface()).(error)
+}
+
+func (this *BaseSocket) MakeAddrToHash() string{
+	sId := fmt.Sprintf("%x",this)
+	C32 := hash.HashC32([]byte(sId))
+	return fmt.Sprintf("%x",C32)
 }

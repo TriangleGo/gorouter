@@ -40,7 +40,7 @@ func NewWsProtocolFromData(data []byte) (*WsProtocol,error) {
 	return wp,nil
 }
 
-func (this *WsProtocol) toBytes() []byte {
+func (this *WsProtocol) ToBytes() []byte {
 	dataJson,_ := simplejson.NewJson(this.Data)
 	
 	json := simplejson.New()

@@ -11,7 +11,6 @@ import (
 	"gorouter/logger"
 	"gorouter/client"
 	"gorouter/util"
-	"gorouter/util/hash"
 	_"net"
 )
 
@@ -38,12 +37,6 @@ func NewConnection(s *socket.BaseSocket) *Connection {
 		FirstDataChan: make(chan []byte, 1024)}
 }
 
-//transform the conection to hash ( using in map[]session )
-func (this *Connection) GetHash() string {
-	sId := fmt.Sprintf("%x%x%x%x",&this.Conn,&this.IpcChan,&this.TcpChan,&this.RpcChan)
-	C32 := hash.HashC32([]byte(sId))
-	return fmt.Sprintf("%x",C32)
-}
 
 //will block the accept thread
 func (this *Connection) SyncServe() {
@@ -189,6 +182,7 @@ func (this *Connection) serveHandle() {
 func (this *Connection) WSServe() {
 	// init handle
 	go this.serveWsHandle()
+	var firstPack = true
 	// parse data
 	const packsize = 8192
 	for {
@@ -200,6 +194,7 @@ func (this *Connection) WSServe() {
 		// error handle 
 		if err != nil {
 			this.ExitChan <- err.Error()
+			return 
 		}
 		// pack handle
 		if n >= packsize {
@@ -219,10 +214,15 @@ func (this *Connection) WSServe() {
 		if err != nil {
 			return
 		}
-		//parse data in json
+		//parse data in jso		
 		wp,err := protocol.NewWsProtocolFromData(padding[0:n])
 		if err != nil {
 			continue
+		}
+		//first pack channel
+		if firstPack {
+			this.FirstDataChan <- wp.ToBytes()
+			firstPack = false
 		}
 		//pass value to handle goroutine
 		this.WsChan <- *wp
@@ -249,7 +249,7 @@ func (this *Connection) serveWsHandle() {
 			logger.Info("handle module:%v command:%v data:%v \n",wp.Module,wp.Command,string(wp.Data))
 			h := router.GetRouter().GetWsHandler()[wp.Module]
 			if h != nil {
-				c := h.Handle(client,wp.Command,string(wp.Module))
+				c := h.Handle(client,wp.Command,string(wp.Data))
 				if c != nil {
 					client = c
 				}

@@ -20,7 +20,7 @@ func NewConnectionManager() *ConnectionManager {
 
 func (this *ConnectionManager) Produce(s *socket.BaseSocket) *Connection {	
 	connection := NewConnection(s)
-	key := connection.GetHash()
+	key := connection.Conn.MakeAddrToHash()
 	//lock
 	this.Mtx.Lock()
 	this.MapConnections[key] = connection
@@ -28,9 +28,16 @@ func (this *ConnectionManager) Produce(s *socket.BaseSocket) *Connection {
 	return connection
 }
 
+func (this *ConnectionManager) GetConnection(s *socket.BaseSocket) *Connection {	
+	hashKey := s.MakeAddrToHash()
+	return this.MapConnections[hashKey]
+}
+
+//delete the connection in the Map 
 func (this *ConnectionManager) Release(c *Connection)  {
 	this.Mtx.Lock()
-	delete(this.MapConnections,c.GetHash())
+	//delete the connection in the Map by conn's Hash value
+	delete(this.MapConnections,c.Conn.MakeAddrToHash())
 	this.Mtx.Unlock()
 }
 

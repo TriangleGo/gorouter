@@ -17,8 +17,10 @@ func (this *WsUserHandlerImpl) Handle(client *client.Client,command string,data 
 	defer util.TraceCrashStack()
 	logger.Info("TODO: WsUserHandlerImpl data =  %v \n",data)
 	switch(command) {
-		case "login":
+		case "echo":
 			//TODO:
+			logger.Info("echo server \n")
+			client.WsSend("user","echo",data)
 			break
 		default:
 			//TODO:
