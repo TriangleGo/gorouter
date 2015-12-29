@@ -14,10 +14,16 @@ func Test_Redis(t *testing.T) {
 	logger.GetLogger().SetLogLevel(5,5)
 	logger.GetLogger().SetOutputDir(`c:\`)
 	logger.GetLogger().Init("testlog")
-	fmt.Printf("redis test running \n")
+	
+	rd := NewRedis()
+	rd.Init()
+	ret ,_ := rd.Pool().Get().Do("GET","abc")
+	
+	
+	fmt.Printf("redis test running %v\n",ret)
 	for {
 		v:= GetCached().Do("get","abc")
-		fmt.Printf("testing v =%v err %v \n",v)
+		fmt.Printf("testing v =%v  \n",v)
 		time.Sleep(1 * time.Second)
 	}
 

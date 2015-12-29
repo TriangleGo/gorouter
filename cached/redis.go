@@ -1,6 +1,7 @@
 package cached
 
 import (
+	
 	"github.com/garyburd/redigo/redis"
 	"gorouter/logger"
 )
@@ -36,7 +37,9 @@ func (this *Redis) Init() {
 } 
 
 func (this *Redis) Do(command string, args ...interface{} ) (interface{}) {
-	reply , err := this.pool.Get().Do(command,args)
+	reply , err := this.pool.Get().Do(command,args ...)
+	
+	logger.Debug("err %v \n",err)
 	
 	if err != nil {
 		logger.Error("Redis command error :%v\n",err)
@@ -45,3 +48,8 @@ func (this *Redis) Do(command string, args ...interface{} ) (interface{}) {
 	return reply
 } 
 
+/*
+func (this *Redis) Pool() *redis.Pool {
+	return this.pool
+}
+*/
