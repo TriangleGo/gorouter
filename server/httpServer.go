@@ -1,7 +1,7 @@
-package server
+﻿package server
 
 import (
-	"github.com/TriangleGo/gorouter/types"
+	"github.com/TriangleGo/gorouter/types" 
 	"io"
 	"net/http"
 	"fmt"
