@@ -1,7 +1,7 @@
 package router
 
 import (
-	_"gorouter/handler"
+
 )
 
 var _global_router *Router

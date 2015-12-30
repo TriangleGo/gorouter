@@ -3,7 +3,6 @@ package network
 import (
 	"time"
 	"fmt"
-	_"gorouter/handler"
 	"gorouter/router"
 	"gorouter/network/protocol"
 	"gorouter/network/socket"

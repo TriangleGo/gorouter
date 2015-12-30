@@ -3,7 +3,6 @@ package client
 import (
 	"gorouter/network/socket"
 	"gorouter/network/protocol"
-	"gorouter/network"
 )
 
 type Client struct {
