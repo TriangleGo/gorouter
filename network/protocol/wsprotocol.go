@@ -2,7 +2,7 @@ package protocol
 
 import (
 	"github.com/bitly/go-simplejson"
-	"gorouter/logger"
+	"github.com/TriangleGo/gorouter/logger"
 )
 
 

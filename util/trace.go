@@ -2,7 +2,7 @@ package util
 
 import (
 	"runtime"
-	"gorouter/logger"
+	"github.com/TriangleGo/gorouter/logger"
 )
 
 func TraceCrashStack() {

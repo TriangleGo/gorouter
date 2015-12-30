@@ -1,11 +1,11 @@
 package server
 
 import (
-	"gorouter/network/socket"
-	"gorouter/network"
-	"gorouter/router"
-	"gorouter/logger"
-	"gorouter/util"
+	"github.com/TriangleGo/gorouter/network/socket"
+	"github.com/TriangleGo/gorouter/network"
+	"github.com/TriangleGo/gorouter/router"
+	"github.com/TriangleGo/gorouter/logger"
+	"github.com/TriangleGo/gorouter/util"
 	"net"
 	"time"
 )

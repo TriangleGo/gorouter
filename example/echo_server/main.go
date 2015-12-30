@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gorouter/router"
-	"gorouter/server"
-	"gorouter/logger"
+	"github.com/TriangleGo/gorouter/router"
+	"github.com/TriangleGo/gorouter/server"
+	"github.com/TriangleGo/gorouter/logger"
 )
 
 //global

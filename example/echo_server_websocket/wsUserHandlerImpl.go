@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gorouter/logger"
-	"gorouter/client"
-	"gorouter/util"
+	"github.com/TriangleGo/gorouter/logger"
+	"github.com/TriangleGo/gorouter/client"
+	"github.com/TriangleGo/gorouter/util"
 )
 
 type WsUserHandlerImpl struct {

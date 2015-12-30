@@ -2,7 +2,7 @@ package network
 
 import (
 	_"net"
-	"gorouter/network/socket"
+	"github.com/TriangleGo/gorouter/network/socket"
 	"sync"
 )
 

@@ -3,12 +3,12 @@ package server
 import (
 	_"io"
 	"net/http"
-	"gorouter/network/socket"	    	
-	"gorouter/network"	   
-	"gorouter/logger"
+	"github.com/TriangleGo/gorouter/network/socket"	    	
+	"github.com/TriangleGo/gorouter/network"	   
+	"github.com/TriangleGo/gorouter/logger"
 	//copy file golang.org/x/net/websocket
-	"gorouter/lib/websocket"
-	"gorouter/router"
+	"github.com/TriangleGo/gorouter/lib/websocket"
+	"github.com/TriangleGo/gorouter/router"
 )
 
 type WebSocketServer struct {

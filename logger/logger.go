@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"runtime"
 	"path/filepath"
-	_"gorouter/lib/goconfig"
+	_"github.com/TriangleGo/gorouter/lib/goconfig"
 )
 
 const (

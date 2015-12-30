@@ -5,7 +5,7 @@ import (
 	"testing"
 	"fmt"
 	_"github.com/garyburd/redigo/redis"
-	"gorouter/logger"
+	"github.com/TriangleGo/gorouter/logger"
 )
 
 

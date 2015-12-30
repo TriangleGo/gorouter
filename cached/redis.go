@@ -3,7 +3,7 @@ package cached
 import (
 	
 	"github.com/garyburd/redigo/redis"
-	"gorouter/logger"
+	"github.com/TriangleGo/gorouter/logger"
 )
 
 

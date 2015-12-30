@@ -2,7 +2,7 @@ package protocol
 
 import (
 	"errors"
-	"gorouter/network/simplebuffer"
+	"github.com/TriangleGo/gorouter/network/simplebuffer"
 )
 
 const PR_HEAD int = 4

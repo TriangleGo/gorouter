@@ -1,8 +1,8 @@
 package client
 
 import (
-	"gorouter/network/socket"
-	"gorouter/network/protocol"
+	"github.com/TriangleGo/gorouter/network/socket"
+	"github.com/TriangleGo/gorouter/network/protocol"
 )
 
 type Client struct {

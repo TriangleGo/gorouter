@@ -1,8 +1,8 @@
 package router
 
 import (
-	"gorouter/client"
-	"gorouter/network/protocol"
+	"github.com/TriangleGo/gorouter/client"
+	"github.com/TriangleGo/gorouter/network/protocol"
 )
 
 // protocol handler

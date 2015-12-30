@@ -1,10 +1,10 @@
 package main
 
 import (
-	"gorouter/logger"
-	"gorouter/client"
-	"gorouter/network/protocol"
-	"gorouter/util"
+	"github.com/TriangleGo/gorouter/logger"
+	"github.com/TriangleGo/gorouter/client"
+	"github.com/TriangleGo/gorouter/network/protocol"
+	"github.com/TriangleGo/gorouter/util"
 )
 
 type MyHandlerImpl struct {

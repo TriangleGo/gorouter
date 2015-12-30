@@ -5,9 +5,9 @@ import (
 	"time"
 	"net"
 	"fmt"
-	"gorouter/lib/websocket"
+	"github.com/TriangleGo/gorouter/lib/websocket"
 	"reflect"
-	"gorouter/util/hash"
+	"github.com/TriangleGo/gorouter/util/hash"
 
 )
 

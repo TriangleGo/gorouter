@@ -3,13 +3,13 @@ package network
 import (
 	"time"
 	"fmt"
-	"gorouter/router"
-	"gorouter/network/protocol"
-	"gorouter/network/socket"
-	"gorouter/network/simplebuffer"
-	"gorouter/logger"
-	"gorouter/client"
-	"gorouter/util"
+	"github.com/TriangleGo/gorouter/router"
+	"github.com/TriangleGo/gorouter/network/protocol"
+	"github.com/TriangleGo/gorouter/network/socket"
+	"github.com/TriangleGo/gorouter/network/simplebuffer"
+	"github.com/TriangleGo/gorouter/logger"
+	"github.com/TriangleGo/gorouter/client"
+	"github.com/TriangleGo/gorouter/util"
 	_"net"
 )
 
