@@ -4,20 +4,18 @@ package db
 import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/TriangleGo/gorouter/config"
 )
 
 var _flag string
 
 func InitMysql() {
-	var	dbhost string
-	var	dbuser string
-	var	dbpass string
-	var	dbname string
+
 	
-	dbhost="127.0.0.1:51816"
-	dbuser="oa_local"
-	dbpass=`f*(&Dssdsa)s`
-	dbname="db_oa_enterprise"
+	dbhost := config.GetConfig("mysql_host")
+	dbuser := config.GetConfig("mysql_user")
+	dbpass := config.GetConfig("mysql_pass")
+	dbname := config.GetConfig("mysql_dbname")
 	
 	orm.RegisterDriver("mysql", orm.DR_MySQL)
 	//username:password@protocol(address)/dbname?param=value

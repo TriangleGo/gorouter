@@ -3,6 +3,7 @@ package cached
 import (
 	
 	"github.com/garyburd/redigo/redis"
+	"github.com/TriangleGo/gorouter/config"
 	"github.com/TriangleGo/gorouter/logger"
 )
 
@@ -32,7 +33,7 @@ func NewRedis() *Redis{
 
 func (this *Redis) Init() {
 	this.pool = redis.NewPool(func()(redis.Conn, error){
-			return redis.Dial("tcp", "127.0.0.1:6379")},20)
+			return redis.Dial("tcp", config.GetConfig("redis_host"))},20)
 	this.pool.MaxActive = 0
 } 
 
