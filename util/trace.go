@@ -18,7 +18,8 @@ func TraceCrashStack() {
 }
 
 
-func TraceSupervisor( fn func() ) {
+func TraceCrashStackAndHandle( fn func() ) {
+	fn()
 	if x := recover(); x != nil {
 		logger.Error("====ERROR:%v====\n", x)
 		for i := 0; i < 10; i++ {
@@ -27,7 +28,6 @@ func TraceSupervisor( fn func() ) {
 				logger.Error("[%v][%s:%v]\n", runtime.FuncForPC(_fn).Name(), _file, _line)
 			}
 		}
-		fn()
 		
 	}
 }

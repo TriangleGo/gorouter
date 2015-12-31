@@ -9,6 +9,7 @@ var _globalConfig map[string]string
 
 
 func InitConfig(){
+	_globalConfig = make(map[string]string)
 	_globalConfig["redis_host"] = "127.0.0.1:6379"
 
 	_globalConfig["mysql_host"] = "127.0.0.1:3306"

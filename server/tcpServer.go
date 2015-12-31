@@ -40,6 +40,12 @@ func (this *TCPServer) GetRouter() *router.Router {
 }
 
 func (this *TCPServer) Run() {
+	
+	for _,v := range this.GetRouter().GetTcpHandler() {
+		v.Init()
+	}
+	
+	
 	if this.ServerListen() != nil {
 		return
 	}

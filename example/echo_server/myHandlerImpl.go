@@ -4,7 +4,6 @@ import (
 	"github.com/TriangleGo/gorouter/logger"
 	"github.com/TriangleGo/gorouter/client"
 	"github.com/TriangleGo/gorouter/network/protocol"
-	"github.com/TriangleGo/gorouter/util"
 )
 
 type MyHandlerImpl struct {
@@ -15,7 +14,6 @@ func (this *MyHandlerImpl) Init()  {
 }
 
 func (this *MyHandlerImpl) Handle(client *client.Client,data *protocol.Protocol) *client.Client {
-	defer util.TraceCrashStack()
 	logger.Info("TODO: MyHandlerImpl data =  %v \n",data)
 	switch(data.Command) {
 		case 0:

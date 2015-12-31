@@ -6,8 +6,7 @@ import (
 )
 
 type Client struct {
-	ClientID int
-	Token    string
+	Container  interface{}
 	conn     *socket.BaseSocket
 
 }
