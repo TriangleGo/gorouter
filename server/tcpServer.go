@@ -45,6 +45,10 @@ func (this *TCPServer) Run() {
 		v.Init()
 	}
 	
+	for _,v := range this.GetRouter().GetIpcHandler() {
+		v.Init()
+	}
+	
 	
 	if this.ServerListen() != nil {
 		return

@@ -28,11 +28,11 @@ type Connection struct {
 
 func NewConnection(s *socket.BaseSocket) *Connection {
 	return &Connection{Conn: s,
-		PacketChan:    make(chan []byte),
-		IpcChan:       make(chan protocol.IPCProtocol),
-		TcpChan:       make(chan protocol.Protocol),
-		WsChan:       make(chan protocol.WsProtocol),
-		RpcChan:       make(chan protocol.Protocol),
+		PacketChan:    make(chan []byte,8192),
+		IpcChan:       make(chan protocol.IPCProtocol,8192),
+		TcpChan:       make(chan protocol.Protocol,8192),
+		WsChan:       make(chan protocol.WsProtocol,8192),
+		RpcChan:       make(chan protocol.Protocol,8192),
 		ExitChan:      make(chan string),
 		Running:		true,
 		FirstDataChan: make(chan []byte, 1024)}
@@ -57,7 +57,6 @@ func (this *Connection) AsyncServe() {
 func (this *Connection) serveLoop() {
 	defer util.TraceCrashStackAndHandle(func() {
 		this.Conn.Close()
-		logger.Info("Crash happened \n")
 	})
 	var fristPack = true
 	for ;this.Running == true; {
@@ -88,6 +87,7 @@ func (this *Connection) serveLoop() {
 		
 		//make the protocal
 		this.PacketChan <- buf[0:n]
+		logger.Info("make protocal complete\n")
 
 	} //end for{}
 	logger.Info("Serve Loop Goroutine End !!!\n")
@@ -99,7 +99,6 @@ func (this *Connection) serveLoop() {
 func (this *Connection) servePacket() {
 	defer util.TraceCrashStackAndHandle(func() {
 		this.Conn.Close()
-		logger.Info("Crash happened \n")
 	})
 	const packsize = 20480
 	bigBuffer := simplebuffer.NewSimpleBufferBySize("bigEndian",packsize) // 2 Mb
@@ -141,15 +140,14 @@ func (this *Connection) servePacket() {
 
 // into the handler
 func (this *Connection) serveHandle() {
-	defer util.TraceCrashStackAndHandle(func() {
-		this.Conn.Close()
-		logger.Info("Crash happened \n")
-	})
 	logger.Info("TCPHandle looping tcp \n")
-
 	defer this.Conn.Close()
-
 	client := client.NewClient(this.Conn)
+	
+	defer util.TraceCrashStackAndHandle(func() {
+		router.GetRouter().GetDisconHandler().Handle(client)
+		this.Conn.Close()
+	})
 
 	//serve when connect
 	go router.GetRouter().ConnHandler.Handle(client, this.FirstDataChan)
@@ -178,13 +176,12 @@ func (this *Connection) serveHandle() {
 			}
 			break
 		case data, ok := <-this.ExitChan:
-			logger.Info("Serve Packet Goroutine Exit !!! %v %v\r\n", data, ok)
+			logger.Info("Serve Handle Goroutine Exit !!! %v %v\r\n", data, ok)
 			router.GetRouter().GetDisconHandler().Handle(client)
-			return
+			break
 		}
 	}
 
-	fmt.Printf("Serve Handle Goroutine End !!! \n")
 }
 
 
@@ -193,7 +190,6 @@ func (this *Connection) serveHandle() {
 func (this *Connection) WSServe() {
 	defer util.TraceCrashStackAndHandle(func() {
 		this.Conn.Close()
-		logger.Info("Crash happened \n")
 	})
 	// init handle
 	go this.serveWsHandle()
@@ -248,7 +244,6 @@ func (this *Connection) WSServe() {
 func (this *Connection) serveWsHandle() {
 	defer util.TraceCrashStackAndHandle(func() {
 		this.Conn.Close()
-		logger.Info("Crash happened \n")
 	})
 	logger.Info("Websocket handle looping tcp \n")
 

@@ -137,7 +137,7 @@ func (this *Logger) getFormat() string {
 	h := time.Now().Hour()
 	m := time.Now().Minute()
 	s := time.Now().Second()
-	format := fmt.Sprintf("%d/%02d/%02d %02d:%02d:%02d %s:%d ",Y,M,D,h,m,s,file,line)
+	format := fmt.Sprintf("%d/%02d/%02d %02d:%02d:%02d %s:%d",Y,M,D,h,m,s,file,line)
 	return format
 }
 
