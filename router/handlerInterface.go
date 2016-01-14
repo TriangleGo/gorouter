@@ -14,13 +14,13 @@ type Handler interface {
 // websocket protocol handler
 type WSHandler interface {
 	Init()
-	Handle(client *client.Client,command string,data string) *client.Client
+	Handle(client *client.Client,data string) *client.Client
 }
 
 // protocol handler
 type IpcHandler interface {
 	Init()
-	Handle(client *client.Client,data interface{}) *client.Client
+	Handle(client *client.Client,command string,data interface{}) *client.Client
 }
 
 //some one disconnected

@@ -169,7 +169,7 @@ func (this *Connection) serveHandle() {
 			logger.Info("IPCHandler %v %v\r\n", data.Data, ok)
 			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
 			if h != nil {
-				c := h.Handle(client,data.Data)
+				c := h.Handle(client,data.CommandId,data.Data)
 				if c != nil {
 					client = c
 				}
@@ -262,7 +262,7 @@ func (this *Connection) serveWsHandle() {
 			logger.Info("handle module:%v command:%v data:%v \n",wp.Module,wp.Command,string(wp.Data))
 			h := router.GetRouter().GetWsHandler()[wp.Module]
 			if h != nil {
-				c := h.Handle(client,wp.Command,string(wp.Data))
+				c := h.Handle(client,string(wp.Data))
 				if c != nil {
 					client = c
 				}
@@ -271,7 +271,7 @@ func (this *Connection) serveWsHandle() {
 			logger.Info("IPCHandler %v %v\r\n", data.Data, ok)
 			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
 			if h != nil {
-				c := h.Handle(client,data.Data)
+				c := h.Handle(client,data.CommandId,data.Data)
 				if c != nil {
 					client = c
 				}
