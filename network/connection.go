@@ -87,7 +87,7 @@ func (this *Connection) serveLoop() {
 		
 		//make the protocal
 		this.PacketChan <- buf[0:n]
-		logger.Info("make protocal complete\n")
+		//logger.Info("make protocal complete\n")
 
 	} //end for{}
 	logger.Info("Serve Loop Goroutine End !!!\n")
@@ -114,15 +114,18 @@ func (this *Connection) servePacket() {
 			//construct the protocol and send it to the handler
 			
 			proto := protocol.NewProtocal()
-			_, err := proto.PraseFromData(bigBuffer.Data(), bigBuffer.Size())
+			ps, err := proto.PraseFromSimpleBuffer(bigBuffer)
 			if err != nil {
+				logger.Info("BigBuffer remain %v \n",bigBuffer.Data())
 				logger.Info("Data Parse failed \n")
 				logger.Info("Buffer : %v\n\n\n", bigBuffer.Data())
 				continue
 			}
 			//### parse success ! reset all ### 
-			bigBuffer = simplebuffer.NewSimpleBufferBySize("bigEndian",packsize) // 2 Mb
-			this.TcpChan <- *proto
+			//bigBuffer = simplebuffer.NewSimpleBufferBySize("bigEndian",packsize) // 2 Mb
+			for _,v := range ps {
+				this.TcpChan <- *v
+			}
 			break
 		// Packget goroutine no need Ipc
 		/*

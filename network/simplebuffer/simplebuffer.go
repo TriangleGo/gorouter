@@ -110,6 +110,18 @@ func (this *SimpleBuffer) ReadUInt32() uint32 {
 	return ret
 }
 
+
+func (this *SimpleBuffer) GetUInt32() uint32 {
+	var _i uint32
+	tsize := int(unsafe.Sizeof(_i))
+	ret := binary.BigEndian.Uint32(this.data[0:tsize])
+	if this.offset <= 0 {
+		return ret
+	}
+	return ret
+}
+
+
 func (this *SimpleBuffer) ReadUInt64() uint64 {
 	var _i uint64
 	tsize := int(unsafe.Sizeof(_i))

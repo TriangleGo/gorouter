@@ -65,6 +65,31 @@ func (this *Protocol) PraseFromData(data []byte, size int) (*Protocol, error) {
 	return this, nil
 }
 
+func (this *Protocol) PraseFromSimpleBuffer(simBuffer *simplebuffer.SimpleBuffer) ([]*Protocol, error) {
+	var protocols []*Protocol
+	if simBuffer.Size() < PR_HEAD + PR_MID+PR_CID {
+		return protocols, errors.New("Buffer size is too small to protocal size")
+	}
+	
+	for {
+		header := simBuffer.GetUInt32()
+		if simBuffer.Size() >= int(header)  + PR_HEAD {		
+			header = simBuffer.ReadUInt32()
+			mid := simBuffer.ReadUInt8()
+			cid := simBuffer.ReadUInt8()
+			rest := simBuffer.ReadData( int(header) - ( PR_MID + PR_CID))
+			p := new(Protocol).ParseFromParam(mid,cid,rest)
+			protocols = append(protocols,p)
+		} else {
+			break
+		}
+	}
+	if len(protocols) == 0 {
+		return nil, errors.New("Protocal header size error \n")
+	}
+	return protocols, nil
+}
+
 func (this *Protocol) GetModuleId() uint8 {
 	return this.ModuleId
 }
