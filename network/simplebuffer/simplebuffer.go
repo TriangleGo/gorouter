@@ -86,6 +86,10 @@ func (this *SimpleBuffer) ReadUInt8() uint8 {
 	return ret
 }
 
+func (this *SimpleBuffer) GetUInt8() uint8 {
+	return this.data[0]
+}
+
 func (this *SimpleBuffer) ReadUInt16() uint16 {
 	var _i uint16
 	tsize := int(unsafe.Sizeof(_i))
@@ -95,6 +99,16 @@ func (this *SimpleBuffer) ReadUInt16() uint16 {
 	}
 	copy(this.data[0:], this.data[tsize:this.offset])
 	this.offset -= tsize
+	return ret
+}
+
+func (this *SimpleBuffer) GetUInt16() uint16 {
+	var _i uint16
+	tsize := int(unsafe.Sizeof(_i))
+	ret := binary.BigEndian.Uint16(this.data[0:tsize])
+	if this.offset <= 0 {
+		return ret
+	}
 	return ret
 }
 
@@ -131,6 +145,16 @@ func (this *SimpleBuffer) ReadUInt64() uint64 {
 	}
 	copy(this.data[0:], this.data[tsize:this.offset])
 	this.offset -= tsize
+	return ret
+}
+
+func (this *SimpleBuffer) GetUInt64() uint64 {
+	var _i uint64
+	tsize := int(unsafe.Sizeof(_i))
+	ret := binary.BigEndian.Uint64(this.data[0:tsize])
+	if this.offset <= 0 {
+		return ret
+	}
 	return ret
 }
 
