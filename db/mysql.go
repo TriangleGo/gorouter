@@ -17,7 +17,7 @@ func InitMysql() {
 	dbpass := config.GetConfig("mysql_pass")
 	dbname := config.GetConfig("mysql_dbname")
 	
-	orm.RegisterDriver("mysql", orm.DR_MySQL)
+	orm.RegisterDriver("mysql", orm.DRMySQL)
 	//username:password@protocol(address)/dbname?param=value
 	conn := dbuser + ":" + dbpass + "@tcp(" + dbhost + ")/" + dbname + "?charset=utf8"
 	//fmt.Printf("ConnString %v\n",conn)
