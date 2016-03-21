@@ -5,6 +5,8 @@ import (
 	"unsafe"
 )
 
+const MAX_SIZE = 8192
+
 type SimpleBuffer struct {
 	data   []byte
 	size   int
@@ -14,7 +16,7 @@ type SimpleBuffer struct {
 
 //endian = "bigEndian" || "litterEndian"
 func NewSimpleBuffer(byteorder string) *SimpleBuffer {
-	return &SimpleBuffer{data: make([]byte, 8192), size: 8192, endian: byteorder}
+	return &SimpleBuffer{data: make([]byte, MAX_SIZE), size: MAX_SIZE, endian: byteorder}
 }
 
 func NewSimpleBufferBySize(byteorder string,size int) *SimpleBuffer {
@@ -35,8 +37,10 @@ func (this *SimpleBuffer) Size() int {
 
 func (this *SimpleBuffer) WriteUInt8(i uint8) *SimpleBuffer {
 	tsize := int(unsafe.Sizeof(i))
-	this.data[this.offset] = i
-	this.offset += tsize
+	buf := make([]byte, tsize)
+	buf[0] = i
+	this.WriteData(buf)
+	//this.offset += tsize
 	return this
 }
 
@@ -44,8 +48,8 @@ func (this *SimpleBuffer) WriteUInt16(i uint16) *SimpleBuffer {
 	tsize := int(unsafe.Sizeof(i))
 	buf := make([]byte, tsize)
 	binary.BigEndian.PutUint16(buf, i)
-	copy(this.data[this.offset:], buf)
-	this.offset += tsize
+	this.WriteData(buf)
+	//this.offset += tsize
 	return this
 }
 
@@ -53,8 +57,8 @@ func (this *SimpleBuffer) WriteUInt32(i uint32) *SimpleBuffer {
 	tsize := int(unsafe.Sizeof(i))
 	buf := make([]byte, tsize)
 	binary.BigEndian.PutUint32(buf, i)
-	copy(this.data[this.offset:], buf)
-	this.offset += tsize
+	this.WriteData(buf)
+	//this.offset += tsize
 	return this
 }
 
@@ -62,16 +66,25 @@ func (this *SimpleBuffer) WriteUInt64(i uint64) *SimpleBuffer {
 	tsize := int(unsafe.Sizeof(i))
 	buf := make([]byte, tsize)
 	binary.BigEndian.PutUint64(buf, i)
-	copy(this.data[this.offset:], buf)
-	this.offset += tsize
+	this.WriteData(buf)
+	//this.offset += tsize
 	return this
 }
 
 func (this *SimpleBuffer) WriteData(d []byte) *SimpleBuffer {
 	size := len(d)
+	if this.offset + size > this.Length()  {
+		tmpBuff := make([]byte,this.Length() + MAX_SIZE)
+		copy(tmpBuff, this.data)
+		this.data = tmpBuff
+	}
 	copy(this.data[this.offset:], d)
 	this.offset += size
 	return this
+}
+
+func (this *SimpleBuffer) Length() int{
+	return len(this.data)
 }
 
 func (this *SimpleBuffer) ReadUInt8() uint8 {
