@@ -7,6 +7,23 @@ import (
 
 const MAX_SIZE = 8192
 
+/*
+	_buffer := NewSimpleBuffer("bigEndian")
+	_buffer.WriteUInt16(5)
+	_buffer.WriteUInt16(6)
+	_buffer.WriteUInt32(7)
+	_buffer.WriteUInt64(8)
+	_buffer.WriteUInt16(9)
+	_buffer.WriteData([]byte("string"))
+	_buffer.ReadUInt16()
+	_buffer.ReadData(2)
+	_buffer.ReadUInt32()
+	_buffer.ReadUInt64()
+	_buffer.ReadUInt16()
+	_buffer.ReadData(6)
+	
+*/
+
 type SimpleBuffer struct {
 	data   []byte
 	size   int
@@ -18,11 +35,12 @@ type SimpleBuffer struct {
 func NewSimpleBuffer(byteorder string) *SimpleBuffer {
 	return &SimpleBuffer{data: make([]byte, MAX_SIZE), size: MAX_SIZE, endian: byteorder}
 }
-
+//endian = "bigEndian" || "litterEndian"
 func NewSimpleBufferBySize(byteorder string,size int) *SimpleBuffer {
 	return &SimpleBuffer{data: make([]byte, size), size: size, endian: byteorder}
 }
 
+//endian = "bigEndian" || "litterEndian"
 func NewSimpleBufferByBytes(d []byte, byteorder string) *SimpleBuffer {
 	return &SimpleBuffer{data: d, size: len(d), offset: len(d), endian: byteorder}
 }
@@ -73,8 +91,10 @@ func (this *SimpleBuffer) WriteUInt64(i uint64) *SimpleBuffer {
 
 func (this *SimpleBuffer) WriteData(d []byte) *SimpleBuffer {
 	size := len(d)
+	var need  int
 	if this.offset + size > this.Length()  {
-		tmpBuff := make([]byte,this.Length() + MAX_SIZE)
+		for need=1; this.Length() + need *MAX_SIZE < this.offset + size ;need ++ {}
+		tmpBuff := make([]byte,this.Length() + need*MAX_SIZE)
 		copy(tmpBuff, this.data)
 		this.data = tmpBuff
 	}
