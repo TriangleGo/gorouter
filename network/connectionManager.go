@@ -1,20 +1,25 @@
 package network
 
 import (
+	"time"
 	_"net"
 	"github.com/TriangleGo/gorouter/network/socket"
 	"sync"
+	"runtime"
+	"runtime/debug"
 )
 
 type ConnectionManager struct {
 	MapConnections  map[string]*Connection
 	Mtx *sync.Mutex
+	LastGCTime int64
 }
 
 func NewConnectionManager() *ConnectionManager {
 	return &ConnectionManager{
 		MapConnections:make(map[string]*Connection),
 		Mtx : new(sync.Mutex),
+		LastGCTime : time.Now().Unix(),
 	}
 }
 
@@ -39,6 +44,13 @@ func (this *ConnectionManager) Release(c *Connection)  {
 	//delete the connection in the Map by conn's Hash value
 	delete(this.MapConnections,c.Conn.MakeAddrToHash())
 	this.Mtx.Unlock()
+	
+	Now := time.Now().Unix()
+	if Now > this.LastGCTime + 60 * 10 { // 10 min go gc
+		runtime.Gosched()
+		runtime.GC()
+		debug.FreeOSMemory()
+	}
 }
 
 /*

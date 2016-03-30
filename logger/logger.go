@@ -15,6 +15,7 @@ const (
 	FILE_SIZE = 1024*1024*5 /* 1m for total byte for unit*/
 )
 
+var mapLevel = map[int]string{5:"[TEST]",4:"[DEBG]",3:"[INFO]",2:"[EROR]",1:"[CRTL]",0:"[NONE]"}
 
 type Logger struct {
 	outputDir string
@@ -149,7 +150,6 @@ func (this *Logger) formatLogText(format string,v ...interface{}) string {
 
 func (this *Logger) Log(lv int,format string , v ...interface{}) {
 	// flush data
-	mapLevel := map[int]string{5:"[TEST]",4:"[DEBG]",3:"[INFO]",2:"[EROR]",1:"[CRTL]",0:"[NONE]"}
 	logText := this.formatLogText(mapLevel[lv] + " " + format,v...)
 	//check if printout the console log
 	if lv > this.logConsolLv {

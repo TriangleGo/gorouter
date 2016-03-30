@@ -28,11 +28,11 @@ type Connection struct {
 
 func NewConnection(s *socket.BaseSocket) *Connection {
 	return &Connection{Conn: s,
-		PacketChan:    make(chan []byte,8192),
-		IpcChan:       make(chan protocol.IPCProtocol,8192),
-		TcpChan:       make(chan protocol.Protocol,8192),
-		WsChan:       make(chan protocol.WsProtocol,8192),
-		RpcChan:       make(chan protocol.Protocol,8192),
+		PacketChan:    make(chan []byte,4096),
+		IpcChan:       make(chan protocol.IPCProtocol,4096),
+		TcpChan:       make(chan protocol.Protocol,4096),
+		WsChan:       make(chan protocol.WsProtocol,1024),
+		RpcChan:       make(chan protocol.Protocol,4096),
 		ExitChan:      make(chan string),
 		Running:		true,
 		FirstDataChan: make(chan []byte, 1024)}
@@ -42,6 +42,7 @@ func NewConnection(s *socket.BaseSocket) *Connection {
 //will block the accept thread
 func (this *Connection) SyncServe() {
 	this.serveLoop()
+	go this.servePacket()
 	go this.serveHandle()
 }
 
@@ -59,9 +60,10 @@ func (this *Connection) serveLoop() {
 		this.Conn.Close()
 	})
 	var fristPack = true
+	buf := make([]byte, 4096)
 	for ;this.Running == true; {
 		//looping to recv the client
-		buf := make([]byte, 8192)
+		//buf := make([]byte, 4096)
 		this.Conn.SetReadDeadline(time.Now().Add( 60 * time.Second))
 		n, err := this.Conn.Read(buf)
 		if err != nil {
@@ -71,8 +73,6 @@ func (this *Connection) serveLoop() {
 			break
 		}
 		
-		logger.Info("recv data %v \n",buf[0:n])
-
 		//when the user connected,the first data will not parse to protocol
 		//it will send to the ConnHandler for modify
 		if fristPack {
@@ -101,7 +101,7 @@ func (this *Connection) servePacket() {
 		this.Conn.Close()
 	})
 	const packsize = 20480
-	bigBuffer := simplebuffer.NewSimpleBufferBySize("bigEndian",packsize) // 2 Mb
+	bigBuffer := simplebuffer.NewSimpleBuffer("BigEndian") 
 	for {
 		select {
 		case data, _ := <-this.PacketChan:
@@ -158,8 +158,8 @@ func (this *Connection) serveHandle() {
 	//loop recv protocol
 	for {
 		select {
-		case data, ok := <-this.TcpChan:
-			logger.Info("TCPHandler %v %v\r\n", data, ok)
+		case data, _ := <-this.TcpChan:
+			logger.Info("TCPHandler %v %v\r\n", data)
 			h := router.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,&data)
@@ -168,8 +168,8 @@ func (this *Connection) serveHandle() {
 				}
 			}
 			break
-		case data, ok := <-this.IpcChan:
-			logger.Info("IPCHandler %v %v\r\n", data.Data, ok)
+		case data, _ := <-this.IpcChan:
+			logger.Info("IPCHandler %v %v\r\n", data.Data)
 			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,data.CommandId,data.Data)
@@ -178,8 +178,8 @@ func (this *Connection) serveHandle() {
 				}
 			}
 			break
-		case data, ok := <-this.ExitChan:
-			logger.Info("Serve Handle Goroutine Exit !!! %v %v\r\n", data, ok)
+		case  <-this.ExitChan:
+			logger.Info("Serve Handle Goroutine Exit !!! \r\n")
 			router.GetRouter().GetDisconHandler().Handle(client)
 			break
 		}
