@@ -50,6 +50,7 @@ func (this *ConnectionManager) Release(c *Connection)  {
 		runtime.Gosched()
 		runtime.GC()
 		debug.FreeOSMemory()
+		this.LastGCTime = Now
 	}
 }
 

@@ -60,10 +60,10 @@ func (this *Connection) serveLoop() {
 		this.Conn.Close()
 	})
 	var fristPack = true
-	buf := make([]byte, 4096)
+
 	for ;this.Running == true; {
 		//looping to recv the client
-		//buf := make([]byte, 4096)
+		buf := make([]byte, 4096)
 		this.Conn.SetReadDeadline(time.Now().Add( 60 * time.Second))
 		n, err := this.Conn.Read(buf)
 		if err != nil {
