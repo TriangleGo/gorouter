@@ -56,9 +56,16 @@ func (this *Connection) AsyncServe() {
 
 // recving the data from socket
 func (this *Connection) serveLoop() {
+	//prevent crash other goroutines
 	defer util.TraceCrashStackAndHandle(func() {
 		this.Conn.Close()
 	})
+	//release the goroutine and connection
+	defer func(){
+		GetConnectionManager().Release(this)
+		logger.Info("Serve Loop Goroutine End !!!\n")
+	}()
+
 	var fristPack = true
 
 	for ;this.Running == true; {
@@ -70,7 +77,7 @@ func (this *Connection) serveLoop() {
 			logger.Info("Client Read Buffer Failed %v %v\r\n", err, n)
 			this.ExitChan <- err.Error()
 			this.ExitChan <- err.Error()
-			break
+			return
 		}
 		
 		//when the user connected,the first data will not parse to protocol
@@ -84,14 +91,13 @@ func (this *Connection) serveLoop() {
 			}
 		}
 		//end first pack
-		
 		//make the protocal
 		this.PacketChan <- buf[0:n]
 		//logger.Info("make protocal complete\n")
 
 	} //end for{}
-	logger.Info("Serve Loop Goroutine End !!!\n")
-	GetConnectionManager().Release(this)
+	
+	
 }
 
 
@@ -126,7 +132,6 @@ func (this *Connection) servePacket() {
 			for _,v := range ps {
 				this.TcpChan <- *v
 			}
-			break
 		// Packget goroutine no need Ipc
 		/*
 		case data, ok := <-this.IpcChan:
@@ -167,7 +172,6 @@ func (this *Connection) serveHandle() {
 					client = c
 				}
 			}
-			break
 		case data, _ := <-this.IpcChan:
 			logger.Info("IPCHandler %v %v\r\n", data.Data)
 			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
@@ -177,11 +181,10 @@ func (this *Connection) serveHandle() {
 					client = c
 				}
 			}
-			break
 		case  <-this.ExitChan:
 			logger.Info("Serve Handle Goroutine Exit !!! \r\n")
 			router.GetRouter().GetDisconHandler().Handle(client)
-			break
+			return
 		}
 	}
 
