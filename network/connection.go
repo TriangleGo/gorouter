@@ -38,7 +38,32 @@ func NewConnection(s *socket.BaseSocket) *Connection {
 		FirstDataChan: make(chan []byte, 1024)}
 }
 
+func (this *Connection) SendTcpChan(p *protocol.Protocol) {
+	if this.Running {
+		this.TcpChan <- *p
+	} else {
+		//done
+	}
+}
+
+func (this *Connection) SendRpcChan(p *protocol.Protocol) {
+	if this.Running {
+		this.RpcChan <- *p
+	} else {
+		//done
+	}
+}
+
+func (this *Connection) SendIpcChan(p *protocol.IPCProtocol) {
+	if this.Running {
+		this.IpcChan <- *p
+	} else {
+		//done
+	}
+}
+
 func (this *Connection) Release() {
+	this.Running = false
 	close(this.ExitChan)
 	close(this.PacketChan)
 	close(this.IpcChan)
@@ -141,7 +166,7 @@ func (this *Connection) servePacket() {
 			//### parse success ! reset all ### 
 			//bigBuffer = simplebuffer.NewSimpleBufferBySize("bigEndian",packsize) // 2 Mb
 			for _,v := range ps {
-				this.TcpChan <- *v
+				this.SendTcpChan(v)
 			}
 		// Packget goroutine no need Ipc
 		/*
@@ -161,9 +186,10 @@ func (this *Connection) serveHandle() {
 	client := client.NewClient(this.Conn)
 	
 	defer util.TraceCrashStackAndHandle(func() {
-		router.GetRouter().GetDisconHandler().Handle(client)
 		this.Conn.Close()
 	})
+	
+	defer router.GetRouter().GetDisconHandler().Handle(client)
 
 	//serve when connect
 	go router.GetRouter().ConnHandler.Handle(client, this.FirstDataChan)
@@ -176,7 +202,7 @@ func (this *Connection) serveHandle() {
 			router.GetRouter().GetDisconHandler().Handle(client)
 			return
 		case data, _ := <-this.TcpChan:
-			logger.Info("TCPHandler %v %v\r\n", data)
+			//logger.Info("TCPHandler %v %v\r\n", data)
 			h := router.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,&data)
@@ -185,7 +211,7 @@ func (this *Connection) serveHandle() {
 				}
 			}
 		case data, _ := <-this.IpcChan:
-			logger.Info("IPCHandler %v %v\r\n", data.Data)
+			//logger.Info("IPCHandler %v %v\r\n", data.Data)
 			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,data.CommandId,data.Data)
