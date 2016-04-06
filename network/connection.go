@@ -38,6 +38,16 @@ func NewConnection(s *socket.BaseSocket) *Connection {
 		FirstDataChan: make(chan []byte, 1024)}
 }
 
+func (this *Connection) Release() {
+	close(this.ExitChan)
+	close(this.PacketChan)
+	close(this.IpcChan)
+	close(this.TcpChan)
+	close(this.WsChan)
+	close(this.RpcChan)
+	close(this.FirstDataChan)
+}
+
 
 //will block the accept thread
 func (this *Connection) SyncServe() {
@@ -75,8 +85,6 @@ func (this *Connection) serveLoop() {
 		n, err := this.Conn.Read(buf)
 		if err != nil {
 			logger.Info("Client Read Buffer Failed %v %v\r\n", err, n)
-			this.ExitChan <- err.Error()
-			this.ExitChan <- err.Error()
 			return
 		}
 		
@@ -110,6 +118,9 @@ func (this *Connection) servePacket() {
 	bigBuffer := simplebuffer.NewSimpleBuffer("BigEndian") 
 	for {
 		select {
+		case data, _ := <-this.ExitChan:
+			logger.Info("Serve Packet Goroutine End !!! %v \r\n", data)
+			return
 		case data, _ := <-this.PacketChan:
 			// construct the protocal packet
 			if len(bigBuffer.Data()) + len(data) > packsize {
@@ -138,9 +149,6 @@ func (this *Connection) servePacket() {
 			logger.Info("ExitHandler %v %v\r\n", data, ok)
 			break
 		*/
-		case data, _ := <-this.ExitChan:
-			logger.Info("Serve Packet Goroutine End !!! %v \r\n", data)
-			return
 		}
 	}
 }
@@ -163,6 +171,10 @@ func (this *Connection) serveHandle() {
 	//loop recv protocol
 	for {
 		select {
+		case  <-this.ExitChan:
+			logger.Info("Serve Handle Goroutine Exit !!! \r\n")
+			router.GetRouter().GetDisconHandler().Handle(client)
+			return
 		case data, _ := <-this.TcpChan:
 			logger.Info("TCPHandler %v %v\r\n", data)
 			h := router.GetRouter().GetTcpHandler()[data.ModuleId]
@@ -181,12 +193,8 @@ func (this *Connection) serveHandle() {
 					client = c
 				}
 			}
-		case  <-this.ExitChan:
-			logger.Info("Serve Handle Goroutine Exit !!! \r\n")
-			router.GetRouter().GetDisconHandler().Handle(client)
-			return
-		}
-	}
+		}// end select
+	} //end for
 
 }
 

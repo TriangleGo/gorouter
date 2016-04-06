@@ -42,6 +42,7 @@ func (this *ConnectionManager) GetConnection(s *socket.BaseSocket) *Connection {
 func (this *ConnectionManager) Release(c *Connection)  {
 	this.Mtx.Lock()
 	//delete the connection in the Map by conn's Hash value
+	c.Release()
 	delete(this.MapConnections,c.Conn.MakeAddrToHash())
 	this.Mtx.Unlock()
 	
