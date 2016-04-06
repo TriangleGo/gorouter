@@ -28,14 +28,14 @@ type Connection struct {
 
 func NewConnection(s *socket.BaseSocket) *Connection {
 	return &Connection{Conn: s,
-		PacketChan:    make(chan []byte,4096),
-		IpcChan:       make(chan protocol.IPCProtocol,4096),
-		TcpChan:       make(chan protocol.Protocol,4096),
+		PacketChan:    make(chan []byte,1024),
+		IpcChan:       make(chan protocol.IPCProtocol,512),
+		TcpChan:       make(chan protocol.Protocol,1024),
 		WsChan:       make(chan protocol.WsProtocol,1024),
-		RpcChan:       make(chan protocol.Protocol,4096),
+		RpcChan:       make(chan protocol.Protocol,512),
 		ExitChan:      make(chan string),
 		Running:		true,
-		FirstDataChan: make(chan []byte, 1024)}
+		FirstDataChan: make(chan []byte, 16)}
 }
 
 func (this *Connection) SendTcpChan(p *protocol.Protocol) {
