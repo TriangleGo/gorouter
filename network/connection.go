@@ -122,6 +122,7 @@ func (this *Connection) serveLoop() {
 			} else {
 				this.FirstDataChan <- buf[0:n]
 			}
+			fristPack = false
 		}
 		//end first pack
 		//make the protocal
@@ -186,6 +187,7 @@ func (this *Connection) serveHandle() {
 	client := client.NewClient(this.Conn)
 	
 	defer util.TraceCrashStackAndHandle(func() {
+		logger.Critial("serveHandle goroutine crash!\n")
 		this.Conn.Close()
 	})
 	
@@ -198,11 +200,11 @@ func (this *Connection) serveHandle() {
 	for {
 		select {
 		case  <-this.ExitChan:
-			logger.Info("Serve Handle Goroutine Exit !!! \r\n")
+			logger.Debug("Serve Handle Goroutine Exit !!! \r\n")
 			router.GetRouter().GetDisconHandler().Handle(client)
 			return
 		case data, _ := <-this.TcpChan:
-			//logger.Info("TCPHandler %v %v\r\n", data)
+			logger.Debug("TCPHandler %v %v\r\n", data)
 			h := router.GetRouter().GetTcpHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,&data)
@@ -211,7 +213,7 @@ func (this *Connection) serveHandle() {
 				}
 			}
 		case data, _ := <-this.IpcChan:
-			//logger.Info("IPCHandler %v %v\r\n", data.Data)
+			logger.Info("IPCHandler %v %v\r\n", data.Data)
 			h := router.GetRouter().GetIpcHandler()[data.ModuleId]
 			if h != nil {
 				c := h.Handle(client,data.CommandId,data.Data)
