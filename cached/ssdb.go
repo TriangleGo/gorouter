@@ -5,7 +5,7 @@ import (
 
 	"github.com/TriangleGo/gorouter/config"
 	//"github.com/TriangleGo/gorouter/logger"
-	"github.com/TriangleGo/redigo/redis"
+	"github.com/TriangleGo/redisgo/redis"
 )
 
 var _ssdb *Ssdb
