@@ -35,7 +35,11 @@ func (this *ConnectionManager) Produce(s *socket.BaseSocket) *Connection {
 
 func (this *ConnectionManager) GetConnection(s *socket.BaseSocket) *Connection {	
 	hashKey := s.MakeAddrToHash()
-	return this.MapConnections[hashKey]
+	this.Mtx.Lock()
+	defer this.Mtx.Unlock()
+	c := this.MapConnections[hashKey]
+	
+	return  c
 }
 
 //delete the connection in the Map 
