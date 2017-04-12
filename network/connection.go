@@ -187,7 +187,7 @@ func (this *Connection) serveHandle() {
 	client := client.NewClient(this.Conn)
 	
 	defer util.TraceCrashStackAndHandle(func() {
-		logger.Critial("serveHandle goroutine crash!\n")
+		logger.Info("serveHandle goroutine crash!\n")
 		this.Conn.Close()
 	})
 	
