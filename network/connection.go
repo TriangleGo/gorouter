@@ -200,9 +200,8 @@ func (this *Connection) serveHandle() {
 	for {
 		select {
 		case  <-this.ExitChan:
-			logger.Debug("Serve Handle Goroutine Exit !!! \r\n")
 			router.GetRouter().GetDisconHandler().Handle(client)
-			return
+			panic(" Serve Handle Goroutine Exit !!! ")
 		case data, _ := <-this.TcpChan:
 			logger.Debug("TCPHandler %v %v\r\n", data)
 			h := router.GetRouter().GetTcpHandler()[data.ModuleId]
