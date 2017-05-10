@@ -63,6 +63,10 @@ func (this *GoAes) pad(data []byte) []byte {
 }
 
 func (this *GoAes) unpad(data []byte) []byte {
+	if len(data) == 0 {
+		return []byte{}
+	}
+	
 	pad := int(data[len(data)-1])
 
 	if pad == 0 {
