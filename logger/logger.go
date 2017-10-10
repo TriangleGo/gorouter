@@ -53,7 +53,7 @@ func (this *Logger) InitFile(logName string) (*os.File,int64) {
 	var offset int64
 	var err error
 	
-	for i:=0;i<100;i++ {
+	for i:=0;;i++ {
 		logFullName := fmt.Sprintf("%s%s_%d%s",this.outputDir,logNameWithDate,i,logExt)
 		fi , err = os.Lstat(logFullName)
 		if err != nil { /* when the file is not exist then create it */
