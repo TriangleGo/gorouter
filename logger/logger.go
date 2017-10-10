@@ -30,7 +30,7 @@ type Logger struct {
 }
 
 func NewLogger() *Logger{
-	return &Logger{chLog: make(chan string)	 ,
+	return &Logger{chLog: make(chan string, 8192),
 			chExit:make(chan bool)}
 }
 
